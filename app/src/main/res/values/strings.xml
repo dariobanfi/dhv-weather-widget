@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">DHV Weather</string>
+    <string name="widget_name">DHV Weather Widget</string>
+    <string name="weather_placeholder">Loading...</string>
+</resources>
