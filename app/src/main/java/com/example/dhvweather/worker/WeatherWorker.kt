@@ -7,8 +7,10 @@ import androidx.work.WorkerParameters
 import com.example.dhvweather.model.DayForecast
 import com.example.dhvweather.model.RegionForecast
 import com.example.dhvweather.model.WeatherData
+import com.example.dhvweather.model.WeatherStatus
 import com.google.gson.Gson
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Element
 
 class WeatherWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
@@ -16,57 +18,96 @@ class WeatherWorker(context: Context, params: WorkerParameters) : CoroutineWorke
         return try {
             Log.d("WeatherWorker", "Starting weather fetch...")
             val url = "https://www.dhv.de/wetter/dhv-wetter/"
-            // specific user agent can sometimes help if they block bots, though unlikely for this site
             val doc = Jsoup.connect(url)
                 .userAgent("Mozilla/5.0 (Android 14; Mobile; rv:109.0) Gecko/119.0 Firefox/119.0")
                 .get()
 
             val regions = mutableListOf<RegionForecast>()
-            val targetRegions = listOf("Deutschland", "Nordalpen", "Südalpen")
             
-            // We use the whole text to avoid complex DOM traversing without knowing the structure.
-            // Jsoup's text() preserves roughly the read order.
-            val fullText = doc.body().text()
-            
-            var searchStartIndex = 0
-            
-            for (i in targetRegions.indices) {
-                val regionName = targetRegions[i]
-                
-                // Find the region header starting from where we left off
-                val regionIndex = fullText.indexOf(regionName, searchStartIndex)
-                
-                if (regionIndex != -1) {
-                    // Look for the NEXT region to define the end of this section
-                    val nextRegionName = if (i + 1 < targetRegions.size) targetRegions[i+1] else null
-                    
-                    val endIndex = if (nextRegionName != null) {
-                         val nextIndex = fullText.indexOf(nextRegionName, regionIndex + regionName.length)
-                         if (nextIndex != -1) nextIndex else fullText.length
-                    } else {
-                        // For the last region, we might want to limit it. 
-                        // Usually "Wetterhinweis" or similar footer text follows, but taking to end is safe for now.
-                        fullText.length
+            // Find all accordion containers for weather sections
+            val accordionContainers = doc.select(".accordion-container")
+
+            for (container in accordionContainers) {
+                // Extract Region Name from the button within h3.accordion-header
+                val regionNameElement = container.select("h3.accordion-header button").firstOrNull()
+                val regionName = regionNameElement?.text()?.trim()
+
+                if (regionName != null) {
+                    val days = mutableListOf<DayForecast>()
+
+                    // Find the accordion-body for this region
+                    val accordionBody = container.select(".accordion-collapse .accordion-body .col-12").firstOrNull()
+
+                    accordionBody?.children()?.forEach { element ->
+                        if (element.tagName() == "h3") {
+                            // This is a day header (e.g., "So. 07.12.2025: Wolkig, leicht regnerisch")
+                            val dateAndWeatherSummary = element.text().trim()
+                            
+                            // The detailed description is in the immediately following <p> tag
+                            val detailParagraph = element.nextElementSibling()
+
+                            if (detailParagraph != null && detailParagraph.tagName() == "p") {
+                                val fullDescription = detailParagraph.text().trim()
+                                
+                                // Determine status from the <p> tag's classes
+                                val status = when {
+                                    detailParagraph.hasClass("thumbs-up") -> WeatherStatus.THUMBS_UP
+                                    detailParagraph.hasClass("thumbs-down") -> WeatherStatus.THUMBS_DOWN
+                                    detailParagraph.hasClass("exclamation") -> WeatherStatus.EXCLAMATION
+                                    else -> WeatherStatus.NONE
+                                }
+
+                                // Split date from weather summary (from h3)
+                                val datePatternInH3 = Regex("""([a-zA-Z]{2}\.?\s+\d{2}\.\d{2}\.(\d{4})?):""")
+                                val dateMatch = datePatternInH3.find(dateAndWeatherSummary)
+                                val dateStr = dateMatch?.value?.trim(':') ?: "N/A"
+
+                                var weatherText = dateAndWeatherSummary.substringAfter(dateStr + ":").trim() // Initial weather from H3
+                                var windText = ""
+
+                                // Combine and parse from the detail paragraph
+                                val windIndex = fullDescription.indexOf("Wind:", ignoreCase = true)
+                                if (windIndex != -1) {
+                                    weatherText += " " + fullDescription.substring(0, windIndex).trim() // Add detailed description
+                                    windText = fullDescription.substring(windIndex).trim()
+                                } else {
+                                    weatherText += " " + fullDescription // Add full description if no wind specified
+                                }
+
+                                // Clean up weatherText (remove multiple spaces, trim)
+                                weatherText = weatherText.replace(Regex("\\s+"), " ").trim()
+
+                                if (dateStr != "N/A") { // Only add if we successfully parsed a date
+                                    days.add(DayForecast(dateStr, weatherText, windText, status))
+                                }
+                            }
+                        }
                     }
-                    
-                    // Extract the chunk for this region
-                    val sectionText = fullText.substring(regionIndex + regionName.length, endIndex)
-                    
-                    val days = parseDaysFromSection(sectionText)
                     if (days.isNotEmpty()) {
                         regions.add(RegionForecast(regionName, days))
                     }
-                    
-                    // Update search start for the next iteration
-                    searchStartIndex = endIndex
                 }
             }
-
+            
             val weatherData = WeatherData(regions)
             val json = Gson().toJson(weatherData)
             
-            // Log the result as requested
-            Log.i("DHV_WEATHER_DATA", json)
+            // Save to SharedPreferences
+            val prefs = applicationContext.getSharedPreferences("weather_prefs", Context.MODE_PRIVATE)
+            prefs.edit().putString("weather_json", json).apply()
+            
+            Log.i("DHV_WEATHER_DATA", "Saved weather data with statuses: $json")
+
+            // Trigger Widget Update
+            val appWidgetManager = android.appwidget.AppWidgetManager.getInstance(applicationContext)
+            val componentName = android.content.ComponentName(applicationContext, com.example.dhvweather.WeatherWidget::class.java)
+            val appWidgetIds = appWidgetManager.getAppWidgetIds(componentName)
+            
+            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, com.example.dhvweather.R.id.weather_list)
+            val intent = android.content.Intent(applicationContext, com.example.dhvweather.WeatherWidget::class.java)
+            intent.action = android.appwidget.AppWidgetManager.ACTION_APPWIDGET_UPDATE
+            intent.putExtra(android.appwidget.AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds)
+            applicationContext.sendBroadcast(intent)
             
             Result.success()
         } catch (e: Exception) {
@@ -77,44 +118,5 @@ class WeatherWorker(context: Context, params: WorkerParameters) : CoroutineWorke
                  Result.failure()
             }
         }
-    }
-
-    private fun parseDaysFromSection(text: String): List<DayForecast> {
-        val days = mutableListOf<DayForecast>()
-        // Regex to find dates like "Mo 08.12.:" or "So. 07.12.2025:"
-        // Matches "Day. DD.MM.YYYY:" or "Day DD.MM.:"
-        val datePattern = Regex("""([a-zA-Z]{2}\.?\s+\d{2}\.\d{2}\.(\d{4})?):""")
-        val matches = datePattern.findAll(text).toList()
-        
-        for (i in matches.indices) {
-            val match = matches[i]
-            val dateStr = match.value.trim(':')
-            
-            val startIdx = match.range.last + 1
-            val endIdx = if (i + 1 < matches.size) matches[i+1].range.first else text.length
-            
-            var content = text.substring(startIdx, endIdx).trim()
-            
-            // Clean up any trailing "TREND:" if the next match caught it? 
-            // Actually the forecast usually starts with the weather description.
-            
-            // Check for "Wind:" split
-            // Note: Sometimes "Wind:" is not present or capitalized differently.
-            val windIndex = content.indexOf("Wind:", ignoreCase = true)
-            
-            val weatherText: String
-            val windText: String
-            
-            if (windIndex != -1) {
-                weatherText = content.substring(0, windIndex).trim()
-                windText = content.substring(windIndex).trim()
-            } else {
-                weatherText = content
-                windText = ""
-            }
-            
-            days.add(DayForecast(dateStr, weatherText, windText))
-        }
-        return days
     }
 }
