@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@android:color/transparent"
+    android:paddingBottom="4dp">
+
+    <TextView
+        android:id="@+id/region_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Region Name"
+        android:textStyle="bold"
+        android:textColor="@color/region_name_text"
+        android:textSize="16sp"
+        android:paddingBottom="8dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:baselineAligned="false">
+
+        <!-- Day 1 -->
+        <LinearLayout
+            android:id="@+id/day1_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginEnd="4dp"
+            android:padding="8dp"
+            android:background="@drawable/day_card_background_rounded">
+            <TextView
+                android:id="@+id/day1_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mon"
+                android:textStyle="bold"
+                android:textSize="11sp"
+                android:textColor="@color/day_text_date"/>
+            <TextView
+                android:id="@+id/day1_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sunny..."
+                android:textSize="10sp"
+                android:maxLines="4"
+                android:ellipsize="end"
+                android:textColor="@color/day_text_secondary"/>
+        </LinearLayout>
+
+        <!-- Day 2 -->
+        <LinearLayout
+            android:id="@+id/day2_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginEnd="4dp"
+            android:padding="8dp"
+            android:background="@drawable/day_card_background_rounded">
+            <TextView
+                android:id="@+id/day2_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tue"
+                android:textStyle="bold"
+                android:textSize="11sp"
+                android:textColor="@color/day_text_date"/>
+            <TextView
+                android:id="@+id/day2_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Rainy..."
+                android:textSize="10sp"
+                android:maxLines="4"
+                android:ellipsize="end"
+                android:textColor="@color/day_text_secondary"/>
+        </LinearLayout>
+
+        <!-- Day 3 -->
+        <LinearLayout
+            android:id="@+id/day3_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:background="@drawable/day_card_background_rounded">
+            <TextView
+                android:id="@+id/day3_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Wed"
+                android:textStyle="bold"
+                android:textSize="11sp"
+                android:textColor="@color/day_text_date"/>
+            <TextView
+                android:id="@+id/day3_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Windy..."
+                android:textSize="10sp"
+                android:maxLines="4"
+                android:ellipsize="end"
+                android:textColor="@color/day_text_secondary"/>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

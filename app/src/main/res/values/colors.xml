@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Widget Background -->
+    <color name="widget_background">#E3F2FD</color> <!-- Light Blue Pastel -->
+    <color name="widget_header_text">#1565C0</color> <!-- Darker Blue -->
+
+    <!-- Day Card Backgrounds based on Status -->
+    <color name="status_thumbs_up_bg">#E8F5E9</color> <!-- Light Green -->
+    <color name="status_thumbs_down_bg">#FFEBEE</color> <!-- Light Red -->
+    <color name="status_exclamation_bg">#FFF3E0</color> <!-- Light Orange -->
+    <color name="status_none_bg">#F0F4F8</color> <!-- Very Light Blue Grey -->
+
+    <!-- Text Colors for Day Cards -->
+    <color name="day_text_primary">#333333</color> <!-- Dark Grey -->
+    <color name="day_text_secondary">#777777</color> <!-- Medium Grey -->
+    <color name="day_text_date">#555555</color> <!-- Slightly lighter than primary -->
+
+    <!-- Region Name Text Color -->
+    <color name="region_name_text">#212121</color> <!-- Very Dark Grey -->
+</resources>
