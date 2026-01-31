@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="8dp" > <!-- Added internal padding to the LinearLayout -->
+        android:padding="4dp" > <!-- Added internal padding to the LinearLayout -->
 
         <ListView
             android:id="@+id/weather_list"

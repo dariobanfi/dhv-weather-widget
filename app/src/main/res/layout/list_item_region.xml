@@ -2,23 +2,26 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
     android:background="@android:color/transparent"
     android:paddingBottom="4dp">
 
     <TextView
         android:id="@+id/region_name"
-        android:layout_width="match_parent"
+        android:layout_width="20dp"
         android:layout_height="wrap_content"
         android:text="Region Name"
-        android:textStyle="bold"
-        android:textColor="@color/region_name_text"
-        android:textSize="16sp"
-        android:paddingBottom="8dp"/>
+        android:fontFamily="sans-serif-medium"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textSize="14sp"
+        android:gravity="center_vertical|start"
+        android:paddingEnd="4dp"/>
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:orientation="horizontal"
         android:baselineAligned="false">
 
@@ -46,7 +49,7 @@
                 android:layout_height="wrap_content"
                 android:text="Sunny..."
                 android:textSize="10sp"
-                android:maxLines="4"
+                android:maxLines="2"
                 android:ellipsize="end"
                 android:textColor="@color/day_text_secondary"/>
         </LinearLayout>
@@ -75,7 +78,7 @@
                 android:layout_height="wrap_content"
                 android:text="Rainy..."
                 android:textSize="10sp"
-                android:maxLines="4"
+                android:maxLines="2"
                 android:ellipsize="end"
                 android:textColor="@color/day_text_secondary"/>
         </LinearLayout>
@@ -103,7 +106,7 @@
                 android:layout_height="wrap_content"
                 android:text="Windy..."
                 android:textSize="10sp"
-                android:maxLines="4"
+                android:maxLines="2"
                 android:ellipsize="end"
                 android:textColor="@color/day_text_secondary"/>
         </LinearLayout>

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
+import androidx.core.content.ContextCompat
 import com.example.dhvweather.model.WeatherData
 import com.example.dhvweather.model.WeatherStatus
 import com.google.gson.Gson
@@ -43,12 +44,12 @@ class WeatherRemoteViewsFactory(private val context: Context) : RemoteViewsServi
         return weatherData?.regions?.size ?: 0
     }
 
-    private fun getColorForStatus(status: WeatherStatus): Int {
+    private fun getBackgroundColorForStatus(status: WeatherStatus): Int {
         return when (status) {
-            WeatherStatus.THUMBS_UP -> Color.parseColor("#4CAF50") // Green
-            WeatherStatus.THUMBS_DOWN -> Color.parseColor("#E57373") // Red
-            WeatherStatus.EXCLAMATION -> Color.parseColor("#FFB74D") // Orange/Yellow
-            WeatherStatus.NONE -> Color.parseColor("#777777") // Default Grey
+            WeatherStatus.THUMBS_UP -> ContextCompat.getColor(context, R.color.status_thumbs_up_bg)
+            WeatherStatus.THUMBS_DOWN -> ContextCompat.getColor(context, R.color.status_thumbs_down_bg)
+            WeatherStatus.EXCLAMATION -> ContextCompat.getColor(context, R.color.status_exclamation_bg)
+            WeatherStatus.NONE -> ContextCompat.getColor(context, R.color.status_none_bg)
         }
     }
 
@@ -64,40 +65,37 @@ class WeatherRemoteViewsFactory(private val context: Context) : RemoteViewsServi
             val day2 = region.days.getOrNull(1)
             val day3 = region.days.getOrNull(2)
 
+            // Day 1
             if (day1 != null) {
                 views.setTextViewText(R.id.day1_date, day1.date.take(10))
                 views.setTextViewText(R.id.day1_text, "${day1.weatherText}\n${day1.windText}")
-                views.setTextColor(R.id.day1_text, getColorForStatus(day1.status))
-                
-                views.setViewVisibility(R.id.day1_date, android.view.View.VISIBLE)
-                views.setViewVisibility(R.id.day1_text, android.view.View.VISIBLE)
+                views.setInt(R.id.day1_container, "setBackgroundColor", getBackgroundColorForStatus(day1.status))
+
+                views.setViewVisibility(R.id.day1_container, android.view.View.VISIBLE)
             } else {
-                 views.setViewVisibility(R.id.day1_date, android.view.View.INVISIBLE)
-                 views.setViewVisibility(R.id.day1_text, android.view.View.INVISIBLE)
+                views.setViewVisibility(R.id.day1_container, android.view.View.INVISIBLE)
             }
 
+            // Day 2
             if (day2 != null) {
                 views.setTextViewText(R.id.day2_date, day2.date.take(10))
                 views.setTextViewText(R.id.day2_text, "${day2.weatherText}\n${day2.windText}")
-                views.setTextColor(R.id.day2_text, getColorForStatus(day2.status))
-                
-                views.setViewVisibility(R.id.day2_date, android.view.View.VISIBLE)
-                views.setViewVisibility(R.id.day2_text, android.view.View.VISIBLE)
+                views.setInt(R.id.day2_container, "setBackgroundColor", getBackgroundColorForStatus(day2.status))
+
+                views.setViewVisibility(R.id.day2_container, android.view.View.VISIBLE)
             } else {
-                 views.setViewVisibility(R.id.day2_date, android.view.View.INVISIBLE)
-                 views.setViewVisibility(R.id.day2_text, android.view.View.INVISIBLE)
+                views.setViewVisibility(R.id.day2_container, android.view.View.INVISIBLE)
             }
 
+            // Day 3
             if (day3 != null) {
                 views.setTextViewText(R.id.day3_date, day3.date.take(10))
                 views.setTextViewText(R.id.day3_text, "${day3.weatherText}\n${day3.windText}")
-                views.setTextColor(R.id.day3_text, getColorForStatus(day3.status))
+                views.setInt(R.id.day3_container, "setBackgroundColor", getBackgroundColorForStatus(day3.status))
 
-                views.setViewVisibility(R.id.day3_date, android.view.View.VISIBLE)
-                views.setViewVisibility(R.id.day3_text, android.view.View.VISIBLE)
+                views.setViewVisibility(R.id.day3_container, android.view.View.VISIBLE)
             } else {
-                 views.setViewVisibility(R.id.day3_date, android.view.View.INVISIBLE)
-                 views.setViewVisibility(R.id.day3_text, android.view.View.INVISIBLE)
+                views.setViewVisibility(R.id.day3_container, android.view.View.INVISIBLE)
             }
             
             // FillInIntent for click handling (opens app)

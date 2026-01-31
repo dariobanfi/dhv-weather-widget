@@ -5,9 +5,9 @@
     <color name="widget_header_text">#1565C0</color> <!-- Darker Blue -->
 
     <!-- Day Card Backgrounds based on Status -->
-    <color name="status_thumbs_up_bg">#E8F5E9</color> <!-- Light Green -->
-    <color name="status_thumbs_down_bg">#FFEBEE</color> <!-- Light Red -->
-    <color name="status_exclamation_bg">#FFF3E0</color> <!-- Light Orange -->
+    <color name="status_thumbs_up_bg">#A5D6A7</color> <!-- Stronger Light Green -->
+    <color name="status_thumbs_down_bg">#EF9A9A</color> <!-- Stronger Light Red -->
+    <color name="status_exclamation_bg">#FFCC80</color> <!-- Stronger Light Orange -->
     <color name="status_none_bg">#F0F4F8</color> <!-- Very Light Blue Grey -->
 
     <!-- Text Colors for Day Cards -->

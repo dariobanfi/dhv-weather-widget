@@ -30,9 +30,18 @@ class WeatherWorker(context: Context, params: WorkerParameters) : CoroutineWorke
             for (container in accordionContainers) {
                 // Extract Region Name from the button within h3.accordion-header
                 val regionNameElement = container.select("h3.accordion-header button").firstOrNull()
-                val regionName = regionNameElement?.text()?.trim()
+                var regionName = regionNameElement?.text()?.trim()
 
                 if (regionName != null) {
+                    // Map region names to single letters
+                    regionName = when {
+                        regionName.contains("Deutschland", ignoreCase = true) -> "D"
+                        regionName.contains("Nordalpen", ignoreCase = true) -> "N"
+                        regionName.contains("Südalpen", ignoreCase = true) -> "S"
+                        regionName.isNotEmpty() -> regionName.substring(0, 1) // Fallback to first letter
+                        else -> regionName
+                    }
+
                     val days = mutableListOf<DayForecast>()
 
                     // Find the accordion-body for this region
