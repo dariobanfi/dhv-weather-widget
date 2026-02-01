@@ -67,7 +67,7 @@ class WeatherRemoteViewsFactory(private val context: Context) : RemoteViewsServi
 
             // Day 1
             if (day1 != null) {
-                views.setTextViewText(R.id.day1_date, day1.date.take(10))
+                // views.setTextViewText(R.id.day1_date, day1.date.take(10)) // Removed
                 views.setTextViewText(R.id.day1_text, "${day1.weatherText}\n${day1.windText}")
                 // views.setInt(R.id.day1_container, "setBackgroundColor", getBackgroundColorForStatus(day1.status)) // Removed to keep rounded shape
 
@@ -78,7 +78,7 @@ class WeatherRemoteViewsFactory(private val context: Context) : RemoteViewsServi
 
             // Day 2
             if (day2 != null) {
-                views.setTextViewText(R.id.day2_date, day2.date.take(10))
+                // views.setTextViewText(R.id.day2_date, day2.date.take(10)) // Removed
                 views.setTextViewText(R.id.day2_text, "${day2.weatherText}\n${day2.windText}")
                 // views.setInt(R.id.day2_container, "setBackgroundColor", getBackgroundColorForStatus(day2.status))
 
@@ -89,7 +89,7 @@ class WeatherRemoteViewsFactory(private val context: Context) : RemoteViewsServi
 
             // Day 3
             if (day3 != null) {
-                views.setTextViewText(R.id.day3_date, day3.date.take(10))
+                // views.setTextViewText(R.id.day3_date, day3.date.take(10)) // Removed
                 views.setTextViewText(R.id.day3_text, "${day3.weatherText}\n${day3.windText}")
                 // views.setInt(R.id.day3_container, "setBackgroundColor", getBackgroundColorForStatus(day3.status))
 

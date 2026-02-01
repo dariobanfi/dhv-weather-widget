@@ -112,7 +112,7 @@ class WeatherWorker(context: Context, params: WorkerParameters) : CoroutineWorke
             val componentName = android.content.ComponentName(applicationContext, com.example.dhvweather.WeatherWidget::class.java)
             val appWidgetIds = appWidgetManager.getAppWidgetIds(componentName)
             
-            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, com.example.dhvweather.R.id.weather_list)
+            // appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, com.example.dhvweather.R.id.weather_list) // Removed
             val intent = android.content.Intent(applicationContext, com.example.dhvweather.WeatherWidget::class.java)
             intent.action = android.appwidget.AppWidgetManager.ACTION_APPWIDGET_UPDATE
             intent.putExtra(android.appwidget.AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds)
