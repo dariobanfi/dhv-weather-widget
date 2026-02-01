@@ -82,6 +82,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="View on DHV"
+            android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="32dp"/>
 

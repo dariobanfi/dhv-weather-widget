@@ -2,7 +2,6 @@
 <resources>
     <style name="Theme.App.DayNight" parent="Theme.Material3.DynamicColors.DayNight">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/widget_header_text</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.App.DayNight" parent="Theme.Material3.DynamicColors.DayNight">
-        <item name="colorPrimary">@color/widget_header_text</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:statusBarColor">?attr/colorSurface</item>
