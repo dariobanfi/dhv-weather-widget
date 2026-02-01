@@ -9,14 +9,14 @@
 
     <TextView
         android:id="@+id/region_name"
-        android:layout_width="20dp"
+        android:layout_width="24dp"
         android:layout_height="wrap_content"
         android:text="Region Name"
-        android:fontFamily="sans-serif-medium"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
         android:textColor="@color/dynamic_on_surface"
         android:textSize="14sp"
         android:gravity="center_vertical|start"
-        android:paddingEnd="4dp"/>
+        android:paddingStart="4dp"/>
 
     <LinearLayout
         android:layout_width="0dp"
@@ -40,6 +40,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:text="Sunny..."
+                android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small"
                 android:textSize="10sp"
                 android:maxLines="20"
                 android:ellipsize="end"
@@ -61,6 +62,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:text="Rainy..."
+                android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small"
                 android:textSize="10sp"
                 android:maxLines="20"
                 android:ellipsize="end"
@@ -81,6 +83,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:text="Windy..."
+                android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small"
                 android:textSize="10sp"
                 android:maxLines="20"
                 android:ellipsize="end"

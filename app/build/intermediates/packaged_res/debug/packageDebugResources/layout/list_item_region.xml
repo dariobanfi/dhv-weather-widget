@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingBottom="4dp">
+
+    <TextView
+        android:id="@+id/region_name"
+        android:layout_width="24dp"
+        android:layout_height="wrap_content"
+        android:text="Region Name"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+        android:textColor="@color/dynamic_on_surface"
+        android:textSize="14sp"
+        android:gravity="center_vertical|start"
+        android:paddingStart="4dp"/>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:baselineAligned="false">
+
+        <!-- Day 1 -->
+        <LinearLayout
+            android:id="@+id/day1_container"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginEnd="4dp"
+            android:padding="8dp"
+            android:background="@drawable/day_card_background_rounded">
+            <TextView
+                android:id="@+id/day1_text"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Sunny..."
+                android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small"
+                android:textSize="10sp"
+                android:maxLines="20"
+                android:ellipsize="end"
+                android:textColor="@color/dynamic_on_surface_variant"/>
+        </LinearLayout>
+
+        <!-- Day 2 -->
+        <LinearLayout
+            android:id="@+id/day2_container"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginEnd="4dp"
+            android:padding="8dp"
+            android:background="@drawable/day_card_background_rounded">
+            <TextView
+                android:id="@+id/day2_text"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Rainy..."
+                android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small"
+                android:textSize="10sp"
+                android:maxLines="20"
+                android:ellipsize="end"
+                android:textColor="@color/dynamic_on_surface_variant"/>
+        </LinearLayout>
+
+        <!-- Day 3 -->
+        <LinearLayout
+            android:id="@+id/day3_container"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:background="@drawable/day_card_background_rounded">
+            <TextView
+                android:id="@+id/day3_text"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Windy..."
+                android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small"
+                android:textSize="10sp"
+                android:maxLines="20"
+                android:ellipsize="end"
+                android:textColor="@color/dynamic_on_surface_variant"/>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

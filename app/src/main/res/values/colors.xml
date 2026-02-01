@@ -1,26 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Widget Background -->
-    <color name="widget_background">#E3F2FD</color> <!-- Light Blue Pastel -->
-    <color name="widget_header_text">#1565C0</color> <!-- Darker Blue -->
+    <color name="widget_background">#E3F2FD</color>
+    <color name="widget_header_text">#1565C0</color>
 
-    <!-- Day Card Backgrounds based on Status -->
-    <color name="status_thumbs_up_bg">#A5D6A7</color> <!-- Stronger Light Green -->
-    <color name="status_thumbs_down_bg">#EF9A9A</color> <!-- Stronger Light Red -->
-    <color name="status_exclamation_bg">#FFCC80</color> <!-- Stronger Light Orange -->
-    <color name="status_none_bg">#F0F4F8</color> <!-- Very Light Blue Grey -->
-
-    <!-- Text Colors for Day Cards -->
-    <color name="day_text_primary">#333333</color> <!-- Dark Grey -->
-    <color name="day_text_secondary">#777777</color> <!-- Medium Grey -->
-    <color name="day_text_date">#555555</color> <!-- Slightly lighter than primary -->
-
-    <!-- Region Name Text Color -->
-    <color name="region_name_text">#212121</color> <!-- Very Dark Grey -->
+    <!-- Region Name -->
+    <color name="region_name_text">#212121</color>
 
     <!-- Dynamic Color Fallbacks -->
     <color name="dynamic_surface_container">#F0F4F8</color>
     <color name="dynamic_surface">#FFFFFF</color>
-    <color name="dynamic_on_surface">#333333</color>
-    <color name="dynamic_on_surface_variant">#777777</color>
+    <color name="dynamic_on_surface">#191C1C</color>
+    <color name="dynamic_on_surface_variant">#40484C</color>
+
+    <!-- Semantic Colors (M3 Light Mode) -->
+    <!-- Good (Green) -->
+    <color name="semantic_good_container">#B8F397</color>
+    <color name="semantic_on_good_container">#042100</color>
+
+    <!-- Bad (Red) -->
+    <color name="semantic_bad_container">#FFDAD6</color>
+    <color name="semantic_on_bad_container">#410002</color>
+
+    <!-- Neutral/Warning (Orange) -->
+    <color name="semantic_neutral_container">#FFDCC1</color>
+    <color name="semantic_on_neutral_container">#2E1500</color>
 </resources>

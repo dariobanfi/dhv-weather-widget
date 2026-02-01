@@ -1,0 +1,78 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Background Gradient (Sky) -->
+    <path
+        android:pathData="M0,0h108v108h-108z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startY="0"
+                android:startX="54"
+                android:endY="108"
+                android:endX="54"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FF4FC3F7"/> <!-- Light Blue -->
+                <item android:offset="1.0" android:color="#FF0288D1"/> <!-- Darker Blue -->
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Sun Halo/Glow -->
+    <path
+        android:pathData="M75,35m-20,0a20,20 0 1,1 40,0a20,20 0 1,1 -40,0"
+        android:fillAlpha="0.3">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:centerX="75"
+                android:centerY="35"
+                android:gradientRadius="20"
+                android:type="radial">
+                <item android:offset="0.0" android:color="#FFFFEE58"/>
+                <item android:offset="1.0" android:color="#00FFEB3B"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Sun Body -->
+    <path
+        android:pathData="M75,35m-12,0a12,12 0 1,1 24,0a12,12 0 1,1 -24,0">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:centerX="75"
+                android:centerY="35"
+                android:gradientRadius="12"
+                android:type="radial">
+                <item android:offset="0.0" android:color="#FFFFEB3B"/>
+                <item android:offset="1.0" android:color="#FFFBC02D"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Cloud Shadow (simulated for depth) -->
+    <path
+        android:pathData="M35,78 C25,78 18,70 18,60 C18,52 23,45 30,43 C33,30 45,22 58,22 C70,22 80,30 84,40 C91,42 96,48 96,56 C96,65 90,72 82,74 L35,78 Z"
+        android:fillColor="#33000000"
+        android:translateX="2"
+        android:translateY="2"/>
+
+    <!-- Cloud Body -->
+    <path
+        android:pathData="M35,76 C25,76 18,68 18,58 C18,50 23,43 30,41 C33,28 45,20 58,20 C70,20 80,28 84,38 C91,40 96,46 96,54 C96,63 90,70 82,72 L35,76 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startY="20"
+                android:startX="54"
+                android:endY="76"
+                android:endX="54"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FFFFFFFF"/>
+                <item android:offset="1.0" android:color="#FFE1F5FE"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+
+</vector>

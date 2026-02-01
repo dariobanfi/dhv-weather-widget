@@ -31,10 +31,6 @@
                 android:resource="@xml/widget_info" />
         </receiver>
 
-        <service
-            android:name=".WeatherWidgetService"
-            android:permission="android.permission.BIND_REMOTEVIEWS" />
-
     </application>
 
 </manifest>

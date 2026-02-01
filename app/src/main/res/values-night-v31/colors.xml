@@ -4,4 +4,17 @@
     <color name="dynamic_surface">@android:color/system_neutral1_900</color>
     <color name="dynamic_on_surface">@android:color/system_neutral1_100</color>
     <color name="dynamic_on_surface_variant">@android:color/system_neutral2_200</color>
+
+    <!-- Semantic Colors (API 31+ Dark) -->
+    <!-- Good (Green) -->
+    <color name="semantic_good_container">#235000</color>
+    <color name="semantic_on_good_container">#B8F397</color>
+
+    <!-- Bad (Red) - Hardcoded M3 Dark Error -->
+    <color name="semantic_bad_container">#93000A</color>
+    <color name="semantic_on_bad_container">#FFDAD6</color>
+
+    <!-- Neutral/Warning (Orange) -->
+    <color name="semantic_neutral_container">#512400</color>
+    <color name="semantic_on_neutral_container">#FFDCC1</color>
 </resources>

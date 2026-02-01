@@ -1,0 +1,54 @@
+[
+    {
+        "merged": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-debug-39:/drawable_bg_card_good.xml.flat",
+        "source": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-main-41:/drawable/bg_card_good.xml"
+    },
+    {
+        "merged": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-debug-39:/drawable_ic_launcher.xml.flat",
+        "source": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-main-41:/drawable/ic_launcher.xml"
+    },
+    {
+        "merged": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-debug-39:/drawable_widget_background_rounded.xml.flat",
+        "source": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-main-41:/drawable/widget_background_rounded.xml"
+    },
+    {
+        "merged": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-debug-39:/drawable_ic_launcher_background.xml.flat",
+        "source": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-main-41:/drawable/ic_launcher_background.xml"
+    },
+    {
+        "merged": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-debug-39:/layout_widget_weather.xml.flat",
+        "source": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-main-41:/layout/widget_weather.xml"
+    },
+    {
+        "merged": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-debug-39:/layout_list_item_region.xml.flat",
+        "source": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-main-41:/layout/list_item_region.xml"
+    },
+    {
+        "merged": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-debug-39:/drawable_day_card_background_rounded.xml.flat",
+        "source": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-main-41:/drawable/day_card_background_rounded.xml"
+    },
+    {
+        "merged": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-debug-39:/drawable_ic_launcher_foreground.xml.flat",
+        "source": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-main-41:/drawable/ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-debug-39:/drawable_bg_card_bad.xml.flat",
+        "source": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-main-41:/drawable/bg_card_bad.xml"
+    },
+    {
+        "merged": "com.example.dhvweather.app-debug-39:/layout_list_item_region.xml.flat",
+        "source": "com.example.dhvweather.app-main-41:/layout/list_item_region.xml"
+    },
+    {
+        "merged": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-debug-39:/drawable_bg_card_neutral.xml.flat",
+        "source": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-main-41:/drawable/bg_card_neutral.xml"
+    },
+    {
+        "merged": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-debug-39:/xml_widget_info.xml.flat",
+        "source": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-main-41:/xml/widget_info.xml"
+    },
+    {
+        "merged": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-debug-39:/drawable-v26_ic_launcher.xml.flat",
+        "source": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-main-41:/drawable-v26/ic_launcher.xml"
+    }
+]
