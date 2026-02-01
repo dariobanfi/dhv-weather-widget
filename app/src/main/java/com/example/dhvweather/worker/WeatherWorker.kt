@@ -45,48 +45,55 @@ class WeatherWorker(context: Context, params: WorkerParameters) : CoroutineWorke
                     val days = mutableListOf<DayForecast>()
 
                     // Find the accordion-body for this region
-                    val accordionBody = container.select(".accordion-collapse .accordion-body .col-12").firstOrNull()
+                    val accordionBody = container.select(".accordion-collapse .accordion-body").firstOrNull()
 
-                    accordionBody?.children()?.forEach { element ->
-                        if (element.tagName() == "h3") {
-                            // This is a day header (e.g., "So. 07.12.2025: Wolkig, leicht regnerisch")
-                            val dateAndWeatherSummary = element.text().trim()
+                    if (accordionBody != null) {
+                        // Split by <hr> to get daily chunks
+                        val dailyChunks = accordionBody.html().split("<hr>")
+                        
+                        for (chunkHtml in dailyChunks) {
+                            val chunkDoc = Jsoup.parseBodyFragment(chunkHtml)
                             
-                            // The detailed description is in the immediately following <p> tag
-                            val detailParagraph = element.nextElementSibling()
-
-                            if (detailParagraph != null && detailParagraph.tagName() == "p") {
-                                val fullDescription = detailParagraph.text().trim()
+                            val header = chunkDoc.select("h3").firstOrNull()
+                            if (header != null) {
+                                val dateAndWeatherSummary = header.text().trim()
                                 
-                                // Determine status from the <p> tag's classes
-                                val status = when {
-                                    detailParagraph.hasClass("thumbs-up") -> WeatherStatus.THUMBS_UP
-                                    detailParagraph.hasClass("thumbs-down") -> WeatherStatus.THUMBS_DOWN
-                                    detailParagraph.hasClass("exclamation") -> WeatherStatus.EXCLAMATION
-                                    else -> WeatherStatus.NONE
-                                }
-
-                                // Split date from weather summary (from h3)
-                                val datePatternInH3 = Regex("""([a-zA-Z]{2}\.?\s+\d{2}\.\d{2}\.(\d{4})?):""")
+                                // Extract Date: "So. 01.02.2026:"
+                                val datePatternInH3 = Regex("""([a-zA-Z]{2}\.?\s+\d{2}\.\d{2}\.(\d{4})?):?""")
                                 val dateMatch = datePatternInH3.find(dateAndWeatherSummary)
-                                val dateStr = dateMatch?.value?.trim(':') ?: "N/A"
-
-                                var weatherText = dateAndWeatherSummary.substringAfter(dateStr + ":").trim() // Initial weather from H3
-                                var windText = ""
-
-                                // Combine and parse from the detail paragraph
-                                val windIndex = fullDescription.indexOf("Wind:", ignoreCase = true)
-                                if (windIndex != -1) {
-                                    weatherText += " " + fullDescription.substring(0, windIndex).trim() // Add detailed description
-                                    windText = fullDescription.substring(windIndex).trim()
+                                val dateStr = dateMatch?.value?.trim(':', ' ') ?: "N/A"
+                                
+                                // Clean Summary: Remove the date prefix from the H3 text
+                                val summaryText = if (dateStr != "N/A") {
+                                    dateAndWeatherSummary.replace(dateStr, "").trim(':', ' ', '\u00A0')
                                 } else {
-                                    weatherText += " " + fullDescription // Add full description if no wind specified
+                                    dateAndWeatherSummary
                                 }
 
-                                // Clean up weatherText (remove multiple spaces, trim)
-                                weatherText = weatherText.replace(Regex("\\s+"), " ").trim()
+                                // Collect full description from all <p> tags
+                                val paragraphs = chunkDoc.select("p")
+                                var fullDescription = ""
+                                var status = WeatherStatus.NONE
+                                
+                                paragraphs.forEach { p ->
+                                    val text = p.text().trim()
+                                    if (text.isNotEmpty()) {
+                                        fullDescription += "$text "
+                                        
+                                        // Determine status
+                                        if (p.hasClass("thumbs-up")) status = WeatherStatus.THUMBS_UP
+                                        if (p.hasClass("thumbs-down")) status = WeatherStatus.THUMBS_DOWN
+                                        if (p.hasClass("exclamation")) status = WeatherStatus.EXCLAMATION
+                                    }
+                                }
+                                // Flatten description: remove newlines/extra spaces
+                                val flatDescription = fullDescription.replace(Regex("\\s+"), " ").trim()
+                                
+                                // Combine into HTML format for display
+                                val weatherText = "<b>$summaryText</b> $flatDescription"
+                                val windText = "" // Wind info is now part of the description
 
-                                if (dateStr != "N/A") { // Only add if we successfully parsed a date
+                                if (dateStr != "N/A") {
                                     days.add(DayForecast(dateStr, weatherText, windText, status))
                                 }
                             }

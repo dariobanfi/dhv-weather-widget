@@ -23,19 +23,3 @@ A modern, Material 3-inspired Android widget and companion app for paragliding p
 2.  Download the latest `app-debug.apk`.
 3.  Install it on your Android device (you may need to enable "Install from unknown sources").
 4.  Long-press your home screen, select **Widgets**, find **DHV Weather**, and drag it to your screen.
-
-## Development 🛠️
-
-This project uses standard Android technologies:
-*   **Kotlin**
-*   **Jetpack WorkManager** (for background fetching)
-*   **Jsoup** (for parsing DHV website data)
-*   **Material Components** (for UI styling)
-
-### Build
-
-```bash
-./gradlew assembleDebug
-```
-
-> **🤖 Built with Gemini:** This entire project, from the first line of code to this README and the CI/CD pipeline, was generated and iterated upon using the **Gemini CLI** agent.

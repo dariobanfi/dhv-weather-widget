@@ -1,4 +1,4 @@
-#Sun Feb 01 16:00:57 CET 2026
+#Sun Feb 01 17:22:53 CET 2026
 base.0=/Users/dariobanfi/Desktop/dhv-weather-widget/app/build/intermediates/dex/debug/mergeExtDexDebug/classes.dex
 base.1=/Users/dariobanfi/Desktop/dhv-weather-widget/app/build/intermediates/dex/debug/mergeProjectDexDebug/0/classes.dex
 base.2=/Users/dariobanfi/Desktop/dhv-weather-widget/app/build/intermediates/dex/debug/mergeProjectDexDebug/11/classes.dex

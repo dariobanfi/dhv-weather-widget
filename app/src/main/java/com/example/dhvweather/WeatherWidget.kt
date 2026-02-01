@@ -5,6 +5,7 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
+import android.text.Html
 import android.widget.RemoteViews
 import androidx.core.net.toUri
 import androidx.core.content.ContextCompat
@@ -104,7 +105,7 @@ internal fun updateAppWidget(
                         WeatherStatus.THUMBS_UP -> Pair(R.drawable.bg_card_good, R.color.semantic_on_good_container)
                         WeatherStatus.THUMBS_DOWN -> Pair(R.drawable.bg_card_bad, R.color.semantic_on_bad_container)
                         WeatherStatus.EXCLAMATION -> Pair(R.drawable.bg_card_neutral, R.color.semantic_on_neutral_container)
-                        else -> Pair(R.drawable.day_card_background_rounded, R.color.dynamic_on_surface_variant)
+                        else -> Pair(R.drawable.day_card_background_rounded, R.color.dynamic_on_surface)
                     }
                     rowViews.setInt(containerId, "setBackgroundResource", bgRes)
                     rowViews.setTextColor(textId, ContextCompat.getColor(context, textColorRes))
@@ -113,7 +114,7 @@ internal fun updateAppWidget(
                 // Day 1
                 val d1 = region.days.getOrNull(0)
                 if (d1 != null) {
-                    rowViews.setTextViewText(R.id.day1_text, "${d1.weatherText}\n${d1.windText}")
+                    rowViews.setTextViewText(R.id.day1_text, Html.fromHtml(d1.weatherText, Html.FROM_HTML_MODE_COMPACT))
                     applyStatusStyle(d1, R.id.day1_container, R.id.day1_text)
                     rowViews.setViewVisibility(R.id.day1_container, android.view.View.VISIBLE)
                 } else {
@@ -123,7 +124,7 @@ internal fun updateAppWidget(
                 // Day 2
                 val d2 = region.days.getOrNull(1)
                 if (d2 != null) {
-                    rowViews.setTextViewText(R.id.day2_text, "${d2.weatherText}\n${d2.windText}")
+                    rowViews.setTextViewText(R.id.day2_text, Html.fromHtml(d2.weatherText, Html.FROM_HTML_MODE_COMPACT))
                     applyStatusStyle(d2, R.id.day2_container, R.id.day2_text)
                     rowViews.setViewVisibility(R.id.day2_container, android.view.View.VISIBLE)
                 } else {
@@ -133,7 +134,7 @@ internal fun updateAppWidget(
                 // Day 3
                 val d3 = region.days.getOrNull(2)
                 if (d3 != null) {
-                    rowViews.setTextViewText(R.id.day3_text, "${d3.weatherText}\n${d3.windText}")
+                    rowViews.setTextViewText(R.id.day3_text, Html.fromHtml(d3.weatherText, Html.FROM_HTML_MODE_COMPACT))
                     applyStatusStyle(d3, R.id.day3_container, R.id.day3_text)
                     rowViews.setViewVisibility(R.id.day3_container, android.view.View.VISIBLE)
                 } else {

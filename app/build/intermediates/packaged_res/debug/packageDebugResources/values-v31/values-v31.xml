@@ -10,6 +10,6 @@
     <color name="semantic_on_bad_container">#410002</color>
     <color name="semantic_on_good_container">#042100</color>
     <color name="semantic_on_neutral_container">#2E1500</color>
-    <dimen name="widget_inner_radius">28dp</dimen>
+    <dimen name="widget_inner_radius">12dp</dimen>
     <dimen name="widget_outer_radius">24dp</dimen>
 </resources>

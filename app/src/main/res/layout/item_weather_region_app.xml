@@ -41,7 +41,7 @@
                 android:text="Sunny..."
                 android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small"
                 android:textSize="12sp"
-                android:textColor="@color/dynamic_on_surface_variant"/>
+                android:textColor="@color/dynamic_on_surface"/>
         </LinearLayout>
 
         <!-- Day 2 -->
@@ -61,7 +61,7 @@
                 android:text="Rainy..."
                 android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small"
                 android:textSize="12sp"
-                android:textColor="@color/dynamic_on_surface_variant"/>
+                android:textColor="@color/dynamic_on_surface"/>
         </LinearLayout>
 
         <!-- Day 3 -->
@@ -80,7 +80,7 @@
                 android:text="Windy..."
                 android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small"
                 android:textSize="12sp"
-                android:textColor="@color/dynamic_on_surface_variant"/>
+                android:textColor="@color/dynamic_on_surface"/>
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

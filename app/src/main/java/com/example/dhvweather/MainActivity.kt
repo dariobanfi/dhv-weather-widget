@@ -2,6 +2,7 @@ package com.example.dhvweather
 
 import android.content.Context
 import android.os.Bundle
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
@@ -101,7 +102,7 @@ class MainActivity : AppCompatActivity() {
                         val container = rowView.findViewById<View>(R.id.day1_container)
                         val textView = rowView.findViewById<TextView>(R.id.day1_text)
                         
-                        textView.text = "${d1.weatherText}\n${d1.windText}"
+                        textView.text = Html.fromHtml(d1.weatherText, Html.FROM_HTML_MODE_COMPACT)
                         applyStatusStyle(d1, container, textView)
                         container.visibility = View.VISIBLE
                     } else {
@@ -114,7 +115,7 @@ class MainActivity : AppCompatActivity() {
                         val container = rowView.findViewById<View>(R.id.day2_container)
                         val textView = rowView.findViewById<TextView>(R.id.day2_text)
                         
-                        textView.text = "${d2.weatherText}\n${d2.windText}"
+                        textView.text = Html.fromHtml(d2.weatherText, Html.FROM_HTML_MODE_COMPACT)
                         applyStatusStyle(d2, container, textView)
                         container.visibility = View.VISIBLE
                     } else {
@@ -127,7 +128,7 @@ class MainActivity : AppCompatActivity() {
                         val container = rowView.findViewById<View>(R.id.day3_container)
                         val textView = rowView.findViewById<TextView>(R.id.day3_text)
                         
-                        textView.text = "${d3.weatherText}\n${d3.windText}"
+                        textView.text = Html.fromHtml(d3.weatherText, Html.FROM_HTML_MODE_COMPACT)
                         applyStatusStyle(d3, container, textView)
                         container.visibility = View.VISIBLE
                     } else {
@@ -149,7 +150,7 @@ class MainActivity : AppCompatActivity() {
             WeatherStatus.THUMBS_UP -> Pair(R.drawable.bg_card_good, R.color.semantic_on_good_container)
             WeatherStatus.THUMBS_DOWN -> Pair(R.drawable.bg_card_bad, R.color.semantic_on_bad_container)
             WeatherStatus.EXCLAMATION -> Pair(R.drawable.bg_card_neutral, R.color.semantic_on_neutral_container)
-            else -> Pair(R.drawable.day_card_background_rounded, R.color.dynamic_on_surface_variant)
+            else -> Pair(R.drawable.day_card_background_rounded, R.color.dynamic_on_surface)
         }
         container.setBackgroundResource(bgRes)
         textView.setTextColor(ContextCompat.getColor(this, textColorRes))

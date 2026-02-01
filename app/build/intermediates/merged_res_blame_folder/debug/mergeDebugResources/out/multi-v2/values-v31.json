@@ -6,9 +6,11 @@
                 {
                     "source": "/Users/dariobanfi/Desktop/dhv-weather-widget/app/src/main/res/values-v31/dimens.xml",
                     "from": {
-                        "startLines": "-1,-1",
-                        "startColumns": "-1,-1",
-                        "startOffsets": "-1,-1"
+                        "startLines": "2,-1",
+                        "startColumns": "4,-1",
+                        "startOffsets": "55,-1",
+                        "endColumns": "50,-1",
+                        "endOffsets": "101,-1"
                     },
                     "to": {
                         "startLines": "222,223",
@@ -21,11 +23,9 @@
                 {
                     "source": "/Users/dariobanfi/Desktop/dhv-weather-widget/app/src/main/res/values-v31/colors.xml",
                     "from": {
-                        "startLines": "-1,-1,-1,-1,13,-1,-1,14,-1,-1",
-                        "startColumns": "-1,-1,-1,-1,4,-1,-1,4,-1,-1",
-                        "startOffsets": "-1,-1,-1,-1,628,-1,-1,685,-1,-1",
-                        "endColumns": "-1,-1,-1,-1,56,-1,-1,59,-1,-1",
-                        "endOffsets": "-1,-1,-1,-1,680,-1,-1,740,-1,-1"
+                        "startLines": "-1,-1,-1,-1,-1,-1,-1,-1,-1,-1",
+                        "startColumns": "-1,-1,-1,-1,-1,-1,-1,-1,-1,-1",
+                        "startOffsets": "-1,-1,-1,-1,-1,-1,-1,-1,-1,-1"
                     },
                     "to": {
                         "startLines": "2,3,4,5,216,217,218,219,220,221",
