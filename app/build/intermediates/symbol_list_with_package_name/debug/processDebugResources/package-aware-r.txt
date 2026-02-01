@@ -3310,6 +3310,7 @@ id notification_main_column
 id notification_main_column_container
 id off
 id on
+id open_browser_button
 id open_search_bar_text_view
 id open_search_view_background
 id open_search_view_clear_button
@@ -3406,6 +3407,7 @@ id startToEnd
 id startVertical
 id staticLayout
 id staticPostLayout
+id status_text
 id stop
 id stretch
 id submenuarrow
@@ -3469,6 +3471,7 @@ id view_tree_view_model_store_owner
 id visible
 id visible_removing_fragment_view_tag
 id weather_container
+id weather_list_container
 id withText
 id with_icon
 id withinBounds
@@ -3588,6 +3591,7 @@ layout abc_search_dropdown_item_icons_2line
 layout abc_search_view
 layout abc_select_dialog_material
 layout abc_tooltip
+layout activity_main
 layout custom_dialog
 layout design_bottom_navigation_item
 layout design_bottom_sheet_dialog
@@ -3606,6 +3610,7 @@ layout design_text_input_end_icon
 layout design_text_input_start_icon
 layout ime_base_split_test_activity
 layout ime_secondary_split_test_activity
+layout item_weather_region_app
 layout list_item_region
 layout m3_alert_dialog
 layout m3_alert_dialog_actions

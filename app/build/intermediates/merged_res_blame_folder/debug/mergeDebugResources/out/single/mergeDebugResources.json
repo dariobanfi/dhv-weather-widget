@@ -1,5 +1,9 @@
 [
     {
+        "merged": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-debug-39:/layout_activity_main.xml.flat",
+        "source": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-main-41:/layout/activity_main.xml"
+    },
+    {
         "merged": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-debug-39:/drawable_bg_card_good.xml.flat",
         "source": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-main-41:/drawable/bg_card_good.xml"
     },
@@ -24,6 +28,14 @@
         "source": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-main-41:/layout/list_item_region.xml"
     },
     {
+        "merged": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-debug-39:/layout_item_weather_region_app.xml.flat",
+        "source": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-main-41:/layout/item_weather_region_app.xml"
+    },
+    {
+        "merged": "com.example.dhvweather.app-debug-39:/layout_activity_main.xml.flat",
+        "source": "com.example.dhvweather.app-main-41:/layout/activity_main.xml"
+    },
+    {
         "merged": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-debug-39:/drawable_day_card_background_rounded.xml.flat",
         "source": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-main-41:/drawable/day_card_background_rounded.xml"
     },
@@ -34,10 +46,6 @@
     {
         "merged": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-debug-39:/drawable_bg_card_bad.xml.flat",
         "source": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-main-41:/drawable/bg_card_bad.xml"
-    },
-    {
-        "merged": "com.example.dhvweather.app-debug-39:/layout_list_item_region.xml.flat",
-        "source": "com.example.dhvweather.app-main-41:/layout/list_item_region.xml"
     },
     {
         "merged": "/Users/dariobanfi/.gradle/daemon/8.13/com.example.dhvweather.app-debug-39:/drawable_bg_card_neutral.xml.flat",

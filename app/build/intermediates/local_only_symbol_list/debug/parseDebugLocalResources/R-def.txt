@@ -32,8 +32,13 @@ id day3_text
 id header_day1
 id header_day2
 id header_day3
+id open_browser_button
 id region_name
+id status_text
 id weather_container
+id weather_list_container
+layout activity_main
+layout item_weather_region_app
 layout list_item_region
 layout widget_weather
 string app_name
