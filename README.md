@@ -2,7 +2,7 @@
 
 A modern, Material 3-inspired Android widget and companion app for paragliding pilots. It fetches specific forecast data from [dhv.de](https://www.dhv.de/wetter/dhv-wetter/) for Germany, Northern Alps, and Southern Alps, presenting it in a clean, glanceable format.
 
-![Widget Screenshot](assets/widget_screenshot.png)
+<img src="assets/widget_screenshot.png" height="400" alt="Widget Screenshot">
 
 ## Features ✨
 
