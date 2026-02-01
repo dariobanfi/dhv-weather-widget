@@ -17,4 +17,10 @@
 
     <!-- Region Name Text Color -->
     <color name="region_name_text">#212121</color> <!-- Very Dark Grey -->
+
+    <!-- Dynamic Color Fallbacks -->
+    <color name="dynamic_surface_container">#F0F4F8</color>
+    <color name="dynamic_surface">#FFFFFF</color>
+    <color name="dynamic_on_surface">#333333</color>
+    <color name="dynamic_on_surface_variant">#777777</color>
 </resources>

@@ -6,6 +6,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
+import androidx.core.net.toUri
 
 /**
  * Implementation of App Widget functionality.
@@ -46,7 +47,7 @@ internal fun updateAppWidget(
     intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
     // When intents are compared, the extras are ignored, so we need to embed the extras
     // into the data so that the extras will not be ignored.
-    intent.data = android.net.Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME))
+    intent.data = intent.toUri(Intent.URI_INTENT_SCHEME).toUri()
     
     views.setRemoteAdapter(R.id.weather_list, intent)
     views.setEmptyView(R.id.weather_list, android.R.id.empty)

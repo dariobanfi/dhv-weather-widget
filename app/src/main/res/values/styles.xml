@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.App.DayNight" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.App.DayNight" parent="Theme.Material3.DynamicColors.DayNight">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/widget_header_text</item>
     </style>
