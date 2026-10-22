@@ -170,7 +170,8 @@ struct OverviewView: View {
             HStack(spacing: spacing) {
                 Group {
                     if isLarge {
-                        Color.clear
+                        // Fixed height: a bare Color.clear would claim a share of the rows' space.
+                        Color.clear.frame(height: 1)
                     } else {
                         Image(systemName: entry.isFromCache ? "icloud.slash" : "wind")
                             .font(.system(size: 11, weight: .bold))
@@ -196,11 +197,14 @@ struct OverviewView: View {
                             if let day = region.day(on: date) {
                                 if isLarge { LargeCell(day: day) } else { MediumCell(day: day) }
                             } else {
+                                // No forecast for this region on that day: a quiet placeholder, not a glass tile.
+                                let shape = RoundedRectangle(cornerRadius: isLarge ? 14 : 10, style: .continuous)
                                 Text("—")
                                     .font(.caption2)
                                     .opacity(0.5)
                                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                    .glassTile(.white.opacity(0.3), cornerRadius: isLarge ? 14 : 10)
+                                    .background { shape.fill(.white.opacity(0.06)) }
+                                    .overlay { shape.strokeBorder(.white.opacity(0.18), lineWidth: 0.6) }
                             }
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
