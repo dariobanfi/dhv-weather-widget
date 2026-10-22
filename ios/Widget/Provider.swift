@@ -6,6 +6,10 @@ enum Timelines {
     /// One entry now, plus one just after each of the next two midnights so
     /// "Today" / "Tomorrow" roll over even if no refresh happens overnight.
     static func make(region: RegionID) async -> Timeline<ForecastEntry> {
+        #if SAMPLE_FORECAST
+        // CI screenshot builds: the built-in sample, which has every DHV marker.
+        return Timeline(entries: [ForecastEntry.sample(region: region)], policy: .never)
+        #else
         let now = Date.now
         // Several widgets reload together; reuse a copy fetched in the last 10 minutes.
         let result = await ForecastLoader.load(maxAge: 10 * 60, now: now)
@@ -24,6 +28,7 @@ enum Timelines {
         }
         let refresh = ForecastLoader.nextRefresh(after: result.forecast, now: now, failed: result.error != nil)
         return Timeline(entries: entries, policy: .after(refresh))
+        #endif
     }
 }
 
