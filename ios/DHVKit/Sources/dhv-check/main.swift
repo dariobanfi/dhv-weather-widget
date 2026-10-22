@@ -14,7 +14,9 @@ if CommandLine.arguments.contains("--html") {
     let html = try await DHVClient().fetchHTML()
     if let r = html.range(of: "Stand") {
         print("--- around \"Stand\":")
-        print(html[html.index(r.lowerBound, offsetBy: -600, limitedBy: html.startIndex) ?? html.startIndex ..< (html.index(r.upperBound, offsetBy: 600, limitedBy: html.endIndex) ?? html.endIndex)])
+        let start = html.index(r.lowerBound, offsetBy: -600, limitedBy: html.startIndex) ?? html.startIndex
+        let end = html.index(r.upperBound, offsetBy: 600, limitedBy: html.endIndex) ?? html.endIndex
+        print(html[start..<end])
     }
     var rest = html[...]
     for i in 1...2 {
