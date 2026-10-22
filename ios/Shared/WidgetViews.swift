@@ -4,7 +4,8 @@ import WidgetKit
 
 // MARK: - Building blocks
 
-/// A day tile: a plain grouping shape, concentric with the widget's corners.
+/// A day tile: a plain grouping shape whose corners follow the widget's own
+/// (about 26 pt on iPhone) minus the content margin.
 ///
 /// Apple's widget guidance leaves the glass to the system: on a Clear Home
 /// Screen iOS renders the widget in accented mode, removes the container
@@ -21,7 +22,9 @@ struct DayTile: ViewModifier {
 
     func body(content: Content) -> some View {
         content.background {
-            ConcentricRectangle(corners: .concentric(minimum: 10), isUniform: true)
+            // Same radius for every tile: a concentric shape would square off
+            // the inner tiles of the grid.
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .fill(fill.opacity(emphasis))
         }
     }

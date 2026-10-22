@@ -145,7 +145,7 @@ final class HomeScreenShots: XCTestCase {
     /// Picks an appearance in Edit → Customize. Returns false if it couldn't.
     private func setAppearance(_ label: String, variant: String? = nil) -> Bool {
         guard openEditMenu("Customize") else { return false }
-        if !loggedCustomize {
+        if !loggedCustomize && ProcessInfo.processInfo.environment["SHOTS_VERBOSE"] != nil {
             loggedCustomize = true
             print("HOMESHOT Customize panel:")
             print(springboard.debugDescription)

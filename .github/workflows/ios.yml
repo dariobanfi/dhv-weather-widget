@@ -103,7 +103,7 @@ jobs:
   screenshots:
     name: Widget screenshots (simulator)
     runs-on: macos-26
-    timeout-minutes: 40
+    timeout-minutes: 60
     defaults:
       run:
         working-directory: ios
@@ -165,7 +165,7 @@ jobs:
         # Default, Dark, Clear and Tinted, i.e. what iOS itself draws, Liquid
         # Glass included. SpringBoard isn't an API, so this never blocks CI.
         continue-on-error: true
-        timeout-minutes: 15
+        timeout-minutes: 25
         run: |
           xcrun simctl ui "$UDID" appearance light
           mkdir -p screenshots/home-screen
