@@ -1,0 +1,181 @@
+name: iOS
+
+on:
+  push:
+    branches: [main]
+    paths: ['ios/**', '.github/workflows/ios.yml']
+    tags: ['ios-v*']
+  pull_request:
+    paths: ['ios/**', '.github/workflows/ios.yml']
+  workflow_dispatch:
+    inputs:
+      commit_screenshots:
+        description: Commit the widget screenshots to assets/ios on this branch
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Test & build unsigned IPA
+    runs-on: macos-26
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: ios
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Toolchain
+        run: |
+          xcodebuild -version
+          swift --version
+          brew install xcodegen
+
+      - name: Parser unit tests
+        working-directory: ios/DHVKit
+        run: swift test
+
+      - name: Live check against dhv.de
+        # Informational: shows what the widget would display right now and
+        # flags a changed page layout, without blocking the build.
+        continue-on-error: true
+        working-directory: ios/DHVKit
+        run: swift run dhv-check
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Archive (no signing)
+        run: |
+          mkdir -p build
+          xcodebuild archive \
+            -project DHVWeather.xcodeproj \
+            -scheme DHVWeather \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath build/DHVWeather.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            | tee build/xcodebuild.log | grep -E '(error|warning: .*deprecated|\*\* ARCHIVE)' || true
+          test -d build/DHVWeather.xcarchive/Products/Applications/DHVWeather.app
+
+      - name: Package IPA
+        run: |
+          APP=build/DHVWeather.xcarchive/Products/Applications/DHVWeather.app
+          test -d "$APP/PlugIns/DHVWidget.appex"
+          rm -rf build/Payload && mkdir -p build/Payload
+          cp -R "$APP" build/Payload/
+          (cd build && zip -qry DHVWeather-unsigned.ipa Payload)
+          ls -lh build/DHVWeather-unsigned.ipa
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DHVWeather-unsigned-ipa
+          path: ios/build/DHVWeather-unsigned.ipa
+          retention-days: 30
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: xcodebuild-log
+          path: ios/build/xcodebuild.log
+
+      - name: Attach IPA to release
+        if: startsWith(github.ref, 'refs/tags/ios-v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ios/build/DHVWeather-unsigned.ipa
+          generate_release_notes: true
+
+  screenshots:
+    name: Widget screenshots (simulator)
+    runs-on: macos-26
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: ios
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Toolchain
+        run: brew install xcodegen
+
+      - name: Pick an iOS 26 iPhone simulator
+        run: |
+          UDID=$(xcrun simctl list devices available -j | jq -r '
+            [.devices | to_entries[] | select(.key | test("iOS-26")) | .value[] | select(.name | startswith("iPhone"))]
+            | (map(select(.name == "iPhone 17 Pro")) + .) | first | .udid')
+          test -n "$UDID" && test "$UDID" != null
+          xcrun simctl list devices | grep "$UDID"
+          echo "UDID=$UDID" >> "$GITHUB_ENV"
+
+      - name: Build for the simulator (Debug)
+        run: |
+          xcodegen generate
+          mkdir -p build
+          xcodebuild build \
+            -project DHVWeather.xcodeproj \
+            -scheme DHVWeather \
+            -configuration Debug \
+            -destination "id=$UDID" \
+            -derivedDataPath build/dd \
+            CODE_SIGNING_ALLOWED=NO \
+            | tee build/sim.log | grep -E '(error|\*\* BUILD)' || true
+          test -d build/dd/Build/Products/Debug-iphonesimulator/DHVWeather.app
+
+      - name: Capture widgets
+        # The gallery screen draws the real widget views at Home Screen and
+        # Lock Screen sizes (debug builds only), with live dhv.de data.
+        run: |
+          xcrun simctl boot "$UDID" || true
+          xcrun simctl bootstatus "$UDID" -b
+          xcrun simctl status_bar "$UDID" override --time 9:41 --batteryState charged --batteryLevel 100 --wifiBars 3 --cellularBars 4
+          xcrun simctl install "$UDID" build/dd/Build/Products/Debug-iphonesimulator/DHVWeather.app
+          mkdir -p screenshots
+          shoot() {
+            xcrun simctl ui "$UDID" appearance "$1"
+            xcrun simctl terminate "$UDID" com.dariobanfi.dhvweather 2>/dev/null || true
+            xcrun simctl launch "$UDID" com.dariobanfi.dhvweather -widgetGallery "$2" ${4:+-gallerySample YES}
+            sleep 12
+            xcrun simctl io "$UDID" screenshot "screenshots/$3.png"
+          }
+          shoot light home home-light
+          shoot dark  home home-dark
+          shoot light lock lock-light
+          shoot dark  lock lock-dark
+          shoot light home home-sample-markers sample
+          ls -l screenshots
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: widget-screenshots
+          path: |
+            ios/screenshots/*.png
+            ios/build/sim.log
+          retention-days: 30
+
+      - name: Commit screenshots to assets/ios
+        if: github.event_name == 'workflow_dispatch' && inputs.commit_screenshots
+        run: |
+          mkdir -p ../assets/ios
+          for f in screenshots/*.png; do
+            sips --resampleWidth 603 "$f" --out "../assets/ios/$(basename "$f")" >/dev/null
+          done
+          cd ..
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/ios
+          git diff --cached --quiet && exit 0
+          git commit -m "Update iOS widget screenshots"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

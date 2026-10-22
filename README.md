@@ -1,25 +1,48 @@
 # DHV Weather Widget 🪂
 
-A modern, Material 3-inspired Android widget and companion app for paragliding pilots. It fetches specific forecast data from [dhv.de](https://www.dhv.de/wetter/dhv-wetter/) for Germany, Northern Alps, and Southern Alps, presenting it in a clean, glanceable format.
+Home Screen widgets and companion apps for **Android and iOS** that show the [DHV-Wetter](https://www.dhv.de/wetter/dhv-wetter/) paragliding forecast for Deutschland, Nordalpen and Südalpen at a glance.
 
-<img src="assets/widget_screenshot.png" height="400" alt="Widget Screenshot">
+| | Android | iOS |
+| --- | --- | --- |
+| Code | [`app/`](app/) (Kotlin) | [`ios/`](ios/) (Swift, SwiftUI, WidgetKit) |
+| Design | Material 3 with dynamic colours | Liquid Glass (iOS 26) |
+| Widgets | 4×2 overview of all regions | Medium and large overview of all regions, small single region, Lock Screen (rectangular and inline) |
+| App | Scrollable forecast with expandable cards | Glass forecast cards per region, pull to refresh |
+| Install | APK from [Releases](../../releases) | Unsigned IPA from GitHub Actions, signed with your own certificate |
 
-## Features ✨
+## Android
 
-*   **Compact Widget:** A 4x2 resizeable widget that fits perfectly on your home screen.
-*   **Material You Integration:** fully dynamic colors that adapt to your wallpaper and system theme (Light/Dark mode supported).
-*   **Semantic Styling:** Color-coded status cards (Green/Red/Neutral) based on the forecast quality.
-*   **Auto-Refresh:**
-    *   **On Open:** Updates immediately when you open the app.
-    *   **Background:** Refreshes automatically every 3 hours.
-*   **Fluid Layout:**
-    *   **Widget:** Dynamic header (Today | Tomorrow | Day Name) and fixed rows.
-    *   **App:** Full-screen scrollable view with expandable cards for detailed reading.
-*   **Google Sans Typography:** Optimized to look native on Pixel devices.
+<img src="assets/widget_screenshot.png" height="400" alt="Android widget">
 
-## Installation 📲
+- Material You colours that follow your wallpaper, light and dark.
+- Header with Today, Tomorrow and the day name, one row per region.
+- Refreshes when you open the app and every 3 hours in the background.
 
-1.  Go to the [Releases](../../releases) page.
-2.  Download the latest `app-debug.apk`.
-3.  Install it on your Android device (you may need to enable "Install from unknown sources").
-4.  Long-press your home screen, select **Widgets**, find **DHV Weather**, and drag it to your screen.
+Install:
+
+1. Download the latest `app-debug.apk` from the [Releases](../../releases) page.
+2. Install it (allow installs from unknown sources if asked).
+3. Long-press the Home Screen → **Widgets** → **DHV Weather**.
+
+## iOS
+
+<img src="assets/ios/home-light.png" height="400" alt="iOS Home Screen widgets"> <img src="assets/ios/lock-dark.png" height="400" alt="iOS Lock Screen and small widgets">
+
+- Liquid Glass tiles tinted by DHV's own markers (Thermikwetter, Störungswetter, Warnhinweis), with weather icons read from DHV's bold key phrases.
+- Days are matched and labelled by date, so the columns stay right after DHV's evening update and at midnight.
+- Refreshes shortly after DHV's announced next update, at least every 3 hours, and whenever you open the app.
+
+Install:
+
+1. Open **Actions** → **iOS** → the latest green run on `main`, and download **DHVWeather-unsigned-ipa**. Pushing a tag like `ios-v1.0.0` also attaches it to a release.
+2. Sign it with your certificate and provisioning profile in your usual tool (ESign, Feather, Sideloadly, zsign…), keeping the widget extension inside the app.
+3. Install, open the app once, then long-press the Home Screen → **Edit** → **Add Widget** → **DHV Wetter**.
+
+Signing notes, App Groups and building in Xcode are in [ios/README.md](ios/README.md).
+
+## Build
+
+- Android: `./gradlew assembleDebug`
+- iOS: `brew install xcodegen && cd ios && xcodegen generate`, then open `DHVWeather.xcodeproj` in Xcode 26. CI builds the unsigned IPA and simulator screenshots of the widgets on every push to `ios/`.
+
+The forecast comes from the DHV website and belongs to the Deutscher Hängegleiterverband. It is not an official flight weather briefing: the pilot decides.

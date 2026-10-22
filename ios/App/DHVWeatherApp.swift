@@ -1,0 +1,29 @@
+import SwiftUI
+
+@main
+struct DHVWeatherApp: App {
+    @State private var store = ForecastStore()
+    @Environment(\.scenePhase) private var scenePhase
+
+    var body: some Scene {
+        WindowGroup {
+            #if DEBUG
+            if let mode = WidgetGallery.Mode.fromLaunchArguments {
+                WidgetGallery(mode: mode)
+            } else {
+                main
+            }
+            #else
+            main
+            #endif
+        }
+    }
+
+    private var main: some View {
+        ContentView(store: store)
+            .onOpenURL { store.open($0) }
+            .task(id: scenePhase) {
+                if scenePhase == .active { await store.refresh(maxAge: 5 * 60) }
+            }
+    }
+}
