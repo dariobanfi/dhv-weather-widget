@@ -8,6 +8,25 @@ let stamp = DateFormatter()
 stamp.timeZone = cal.timeZone
 stamp.dateFormat = "EEE dd.MM.yyyy HH:mm"
 
+// `dhv-check --html` prints the raw markup the parser works on, to adapt it
+// when DHV changes the page.
+if CommandLine.arguments.contains("--html") {
+    let html = try await DHVClient().fetchHTML()
+    if let r = html.range(of: "Stand") {
+        print("--- around \"Stand\":")
+        print(html[html.index(r.lowerBound, offsetBy: -600, limitedBy: html.startIndex) ?? html.startIndex ..< (html.index(r.upperBound, offsetBy: 600, limitedBy: html.endIndex) ?? html.endIndex)])
+    }
+    var rest = html[...]
+    for i in 1...2 {
+        guard let r = rest.range(of: "accordion-container") else { break }
+        let end = rest.index(r.lowerBound, offsetBy: 7000, limitedBy: rest.endIndex) ?? rest.endIndex
+        print("\n--- accordion \(i):")
+        print(rest[r.lowerBound..<end])
+        rest = rest[r.upperBound...]
+    }
+    exit(0)
+}
+
 do {
     let forecast = try await DHVClient().fetch()
     print("Stand: \(forecast.issuedAt.map(stamp.string(from:)) ?? "not found")")

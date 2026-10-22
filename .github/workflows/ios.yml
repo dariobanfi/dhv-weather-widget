@@ -43,7 +43,11 @@ jobs:
         # flags a changed page layout, without blocking the build.
         continue-on-error: true
         working-directory: ios/DHVKit
-        run: swift run dhv-check
+        run: |
+          swift run dhv-check
+          echo "::group::Raw page markup"
+          swift run dhv-check --html
+          echo "::endgroup::"
 
       - name: Generate Xcode project
         run: xcodegen generate

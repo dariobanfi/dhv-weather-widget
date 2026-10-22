@@ -15,6 +15,10 @@ public struct DHVClient: Sendable {
     }
 
     public func fetch(now: Date = .now) async throws -> Forecast {
+        try DHVParser(now: now).parse(html: try await fetchHTML())
+    }
+
+    public func fetchHTML() async throws -> String {
         var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: timeout)
         request.setValue("DHVWeather-iOS/1.0 (+https://github.com/dariobanfi/dhv-weather-widget)", forHTTPHeaderField: "User-Agent")
         request.setValue("de-DE,de;q=0.9", forHTTPHeaderField: "Accept-Language")
@@ -23,8 +27,7 @@ public struct DHVClient: Sendable {
         if let http = response as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
             throw DHVError.badResponse(http.statusCode)
         }
-        let html = String(data: data, encoding: .utf8) ?? String(decoding: data, as: UTF8.self)
-        return try DHVParser(now: now).parse(html: html)
+        return String(data: data, encoding: .utf8) ?? String(decoding: data, as: UTF8.self)
     }
 }
 
