@@ -265,20 +265,22 @@ struct MediumCell: View {
     var day: DayForecast
 
     var body: some View {
-        HStack(alignment: .top, spacing: 3) {
-            SkyIcon(day: day, size: 10)
+        // Icons on their own row, so the badges never sit on the text.
+        VStack(alignment: .leading, spacing: 1) {
+            HStack(spacing: 3) {
+                SkyIcon(day: day, size: 10)
+                Spacer(minLength: 0)
+                DayBadges(day: day, size: 10)
+            }
             Text(day.headline)
                 .font(.system(size: 9.5, weight: .semibold))
-                .lineLimit(3)
+                .lineLimit(2)
                 .minimumScaleFactor(0.75)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(.horizontal, 5)
         .padding(.vertical, 4)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .overlay(alignment: .bottomTrailing) {
-            DayBadges(day: day, size: 11).padding(4)
-        }
         .dayTile(day)
     }
 }
