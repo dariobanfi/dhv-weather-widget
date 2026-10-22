@@ -8,6 +8,11 @@ on:
   pull_request:
     paths: ['ios/**', '.github/workflows/ios.yml']
   workflow_dispatch:
+    inputs:
+      commit_screenshots:
+        description: Commit the widget screenshots to assets/ios on this branch
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -159,3 +164,18 @@ jobs:
             ios/screenshots/*.png
             ios/build/sim.log
           retention-days: 30
+
+      - name: Commit screenshots to assets/ios
+        if: github.event_name == 'workflow_dispatch' && inputs.commit_screenshots
+        run: |
+          mkdir -p ../assets/ios
+          for f in screenshots/*.png; do
+            sips --resampleWidth 603 "$f" --out "../assets/ios/$(basename "$f")" >/dev/null
+          done
+          cd ..
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/ios
+          git diff --cached --quiet && exit 0
+          git commit -m "Update iOS widget screenshots"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
