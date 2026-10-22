@@ -28,10 +28,10 @@ Install:
 
 <img src="assets/ios/hs-default.png" height="400" alt="iOS Home Screen, Default"> <img src="assets/ios/hs-dark.png" height="400" alt="iOS Home Screen, Dark"> <img src="assets/ios/hs-clear.png" height="400" alt="iOS Home Screen, Clear (Liquid Glass)"> <img src="assets/ios/hs-tinted.png" height="400" alt="iOS Home Screen, Tinted"> <img src="assets/ios/lock-dark.png" height="400" alt="iOS Lock Screen and small widgets">
 
-Real iOS 26 Home Screen in the simulator: Default, Dark, Clear and Tinted. The glass is drawn by iOS itself.
+Real iOS 26 Home Screen in the simulator: Default, Dark, Clear and Tinted, with the built-in sample forecast so DHV's markers show. The glass is drawn by iOS itself.
 
 - Built to Apple's widget guidance for Liquid Glass: the background lives in `containerBackground`, so with a **Clear** or **Tinted** Home Screen (long-press → Edit → Customize) iOS swaps it for real Liquid Glass or your tint. In Default and Dark the widget is full colour.
-- Day tiles are tinted by DHV's own markers (Thermikwetter, Störungswetter, Warnhinweis), with weather icons read from DHV's bold key phrases. In Clear and Tinted the markers stay readable as symbols.
+- Day tiles are tinted by DHV's own markers (Thermikwetter, Störungswetter, Warnhinweis), with weather icons read from DHV's bold key phrases. The green, yellow and red stay in colour on a Clear or Tinted Home Screen too, and each marked day also shows its symbol.
 - Days are matched and labelled by date, so the columns stay right after DHV's evening update and at midnight.
 - Refreshes shortly after DHV's announced next update, at least every 3 hours, and whenever you open the app.
 

@@ -14,10 +14,10 @@ import WidgetKit
 /// and turns every colour white. To keep DHV's rating readable there:
 /// - the rating colour is drawn as an image marked
 ///   `widgetAccentedRenderingMode(.fullColor)`, the documented way to keep an
-///   image's colour in accented mode;
-/// - if iOS whitens it anyway, the fill's strength still ranks the days
-///   (Thermikwetter brightest, Störungswetter faintest of the rated days, no
-///   rating fainter still), and each rated day carries its symbol.
+///   image's colour in accented mode (checked on the simulator's Home Screen:
+///   green, yellow and red survive in Clear and Tinted, a plain fill doesn't);
+/// - good days are drawn a little stronger and each rated day carries its
+///   symbol, so the rating still reads if a future iOS whitens images too.
 struct DayTile: ViewModifier {
     /// DHV's rating, or nil for an empty slot.
     var rating: Rating?
@@ -44,15 +44,15 @@ struct DayTile: ViewModifier {
 
     private var fill: Color {
         guard mode == .fullColor else { return .white.opacity(0.10) }
-        if let rating, rating != .neutral { return rating.tint.opacity(scheme == .dark ? 0.34 : 0.40) }
+        if let rating, rating != .neutral { return rating.tint.opacity(scheme == .dark ? 0.42 : 0.48) }
         return .white.opacity(scheme == .dark ? 0.10 : 0.17)
     }
 
     private func accentedStrength(_ rating: Rating) -> Double {
         switch rating {
         case .good: 0.62
-        case .mixed: 0.46
-        case .poor: 0.34
+        case .mixed: 0.58
+        case .poor: 0.55
         case .neutral: 0.10
         }
     }
@@ -68,13 +68,6 @@ enum Swatch {
             context.fill(CGRect(origin: .zero, size: size))
         }
         return Image(uiImage: bitmap)
-    }
-
-    /// An SF Symbol baked into a bitmap in one colour, so accented mode can't recolour it.
-    static func symbol(_ name: String, _ color: Color) -> Image {
-        let config = UIImage.SymbolConfiguration(pointSize: 40, weight: .bold)
-        guard let symbol = UIImage(systemName: name, withConfiguration: config) else { return image(color) }
-        return Image(uiImage: symbol.withTintColor(UIColor(color), renderingMode: .alwaysOriginal))
     }
 }
 
@@ -178,17 +171,7 @@ struct OverviewView: View {
     private var family: WidgetFamily { familyOverride ?? environmentFamily }
 
     var body: some View {
-        Group {
-            #if TINT_LAB
-            if family == .systemMedium {
-                TintLab()
-            } else {
-                content
-            }
-            #else
-            content
-            #endif
-        }
+        content
         .containerBackground(for: .widget) { SkyBackground() }
         .widgetURL(URL(string: "dhvweather://"))
     }
@@ -462,45 +445,3 @@ struct RegionView: View {
     }
 }
 
-#if TINT_LAB
-/// CI-only test card: each row is one way of putting DHV's rating colours on
-/// the Home Screen, to see which survive the Clear and Tinted looks.
-struct TintLab: View {
-    private let colors: [Rating] = [.good, .mixed, .poor]
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 3) {
-            row("A img") { r in
-                Swatch.image(r.tint).resizable().widgetAccentedRenderingMode(.fullColor)
-            }
-            row("B sym") { r in
-                Image(systemName: "square.fill").resizable()
-                    .widgetAccentedRenderingMode(.fullColor).foregroundStyle(r.tint)
-            }
-            row("C fill") { r in
-                Rectangle().fill(r.tint)
-            }
-            row("D glass") { r in
-                Color.clear.glassEffect(.regular.tint(r.tint), in: .rect(cornerRadius: 6))
-            }
-            row("E icon") { r in
-                Swatch.symbol(r.symbol, r.tint).resizable()
-                    .widgetAccentedRenderingMode(.fullColor).scaledToFit()
-            }
-        }
-        .padding(10)
-        .foregroundStyle(.white)
-    }
-
-    private func row<Cell: View>(_ label: String, @ViewBuilder _ cell: @escaping (Rating) -> Cell) -> some View {
-        HStack(spacing: 6) {
-            Text(label).font(.system(size: 11, weight: .bold)).frame(width: 52, alignment: .leading)
-            ForEach(colors, id: \.self) { r in
-                cell(r)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
-            }
-        }
-    }
-}
-#endif

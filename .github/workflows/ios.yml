@@ -14,7 +14,7 @@ on:
         type: boolean
         default: false
       widget_flags:
-        description: Extra compile conditions for the Home Screen test build (SAMPLE_FORECAST, TINT_LAB)
+        description: Extra compile conditions for the Home Screen test build (e.g. SAMPLE_FORECAST)
         type: string
         default: SAMPLE_FORECAST
       commit_debug:
