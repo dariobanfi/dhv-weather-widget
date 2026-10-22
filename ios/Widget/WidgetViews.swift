@@ -45,16 +45,34 @@ extension View {
     }
 }
 
-struct RatingIcon: View {
+/// Sky icon from DHV's wording, in full colour where the Home Screen allows it.
+struct SkyIcon: View {
     var day: DayForecast
     var size: CGFloat
     @Environment(\.widgetRenderingMode) private var mode
 
     var body: some View {
-        Image(systemName: day.rating.symbol)
+        Image(systemName: day.sky.symbol)
             .font(.system(size: size, weight: .semibold))
             .symbolRenderingMode(mode == .fullColor ? .multicolor : .monochrome)
             .widgetAccentable()
+    }
+}
+
+/// DHV's thumbs marker and warning, if the day has any.
+struct DayBadges: View {
+    var day: DayForecast
+    var size: CGFloat
+
+    var body: some View {
+        HStack(spacing: 2) {
+            if day.rating != .neutral {
+                Image(systemName: day.rating.symbol)
+                    .font(.system(size: size, weight: .bold))
+                    .widgetAccentable()
+            }
+            if day.hasWarning { WarningBadge(size: size) }
+        }
     }
 }
 
@@ -205,7 +223,7 @@ struct MediumCell: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 3) {
-            RatingIcon(day: day, size: 10)
+            SkyIcon(day: day, size: 10)
             Text(day.headline)
                 .font(.system(size: 9.5, weight: .semibold))
                 .lineLimit(3)
@@ -216,7 +234,7 @@ struct MediumCell: View {
         .padding(.vertical, 4)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .overlay(alignment: .bottomTrailing) {
-            if day.hasWarning { WarningBadge(size: 7).padding(3) }
+            DayBadges(day: day, size: 7).padding(3)
         }
         .glassTile(day.tint, cornerRadius: 10)
     }
@@ -228,16 +246,16 @@ struct LargeCell: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
             HStack(alignment: .top, spacing: 4) {
-                RatingIcon(day: day, size: 12)
+                SkyIcon(day: day, size: 12)
                 Spacer(minLength: 0)
-                if day.hasWarning { WarningBadge(size: 9) }
+                DayBadges(day: day, size: 9)
             }
             Text(day.headline)
                 .font(.system(size: 11, weight: .bold))
                 .lineLimit(2)
                 .minimumScaleFactor(0.8)
-            if let text = day.summary ?? day.details.first {
-                Text(text)
+            if !day.emphasis.isEmpty || day.summary != nil {
+                Text(day.emphasis.isEmpty ? (day.summary ?? "") : day.keyPhrase)
                     .font(.system(size: 9.5))
                     .lineLimit(3)
                     .opacity(0.85)
@@ -291,7 +309,7 @@ struct RegionView: View {
     @ViewBuilder
     private var inline: some View {
         if let day = days.first {
-            Label("\(entry.region.shortName): \(day.headline)", systemImage: day.rating.symbol)
+            Label("\(entry.region.shortName): \(day.headline)", systemImage: day.sky.symbol)
         } else {
             Label("DHV: no forecast", systemImage: "wind")
         }
@@ -302,7 +320,7 @@ struct RegionView: View {
         if let day = days.first {
             VStack(alignment: .leading, spacing: 1) {
                 HStack(spacing: 4) {
-                    Image(systemName: day.rating.symbol)
+                    Image(systemName: day.sky.symbol)
                     Text("\(entry.region.name) · \(DayLabel.text(for: day.date, now: entry.date))")
                         .lineLimit(1)
                     if day.hasWarning { Image(systemName: "exclamationmark.triangle.fill") }
@@ -343,12 +361,12 @@ struct RegionView: View {
 
                 VStack(alignment: .leading, spacing: 3) {
                     HStack(spacing: 4) {
-                        RatingIcon(day: today, size: 13)
+                        SkyIcon(day: today, size: 13)
                         Text(DayLabel.text(for: today.date, now: entry.date))
                             .font(.system(size: 10, weight: .semibold))
                             .opacity(0.85)
                         Spacer(minLength: 0)
-                        if today.hasWarning { WarningBadge(size: 9) }
+                        DayBadges(day: today, size: 9)
                     }
                     Text(today.headline)
                         .font(.system(size: 12.5, weight: .bold))
@@ -361,7 +379,7 @@ struct RegionView: View {
 
                 ForEach(days.dropFirst().prefix(2)) { day in
                     HStack(spacing: 4) {
-                        RatingIcon(day: day, size: 9)
+                        SkyIcon(day: day, size: 9)
                             .frame(width: 13)
                         Text(DayLabel.text(for: day.date, now: entry.date, short: true))
                             .font(.system(size: 9, weight: .bold))

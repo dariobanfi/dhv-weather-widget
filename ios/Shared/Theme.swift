@@ -11,12 +11,13 @@ extension Rating {
         }
     }
 
+    /// DHV's own legend uses thumbs up / down for these markers.
     var symbol: String {
         switch self {
-        case .good: "sun.max.fill"
-        case .mixed: "cloud.sun.fill"
-        case .poor: "cloud.rain.fill"
-        case .neutral: "cloud.fill"
+        case .good: "hand.thumbsup.fill"
+        case .mixed: "plusminus"
+        case .poor: "hand.thumbsdown.fill"
+        case .neutral: "circle"
         }
     }
 
@@ -27,6 +28,23 @@ extension Rating {
         case .mixed: "Thermik & Störung"
         case .poor: "Störungswetter"
         case .neutral: "Ohne Wertung"
+        }
+    }
+}
+
+extension Sky {
+    var symbol: String {
+        switch self {
+        case .thunder: "cloud.bolt.rain.fill"
+        case .snow: "cloud.snow.fill"
+        case .rain: "cloud.rain.fill"
+        case .showers: "cloud.sun.rain.fill"
+        case .overcast: "cloud.fill"
+        case .fog: "cloud.fog.fill"
+        case .foehn: "wind"
+        case .partlyCloudy: "cloud.sun.fill"
+        case .sunny: "sun.max.fill"
+        case .unknown: "cloud.sun.fill"
         }
     }
 }

@@ -9,7 +9,8 @@ A native iOS 26 app and WidgetKit widgets for the [DHV-Wetter](https://www.dhv.d
 | **DHV Wetter** | Medium, Large | All three regions × the next days. Medium: headline per day. Large: headline, summary and wind. |
 | **DHV Region** | Small, Lock Screen (rectangular, inline) | One region (long-press → Edit Widget to choose). |
 
-- Each day is a glass tile tinted by DHV's own markers: green = Thermikwetter, red = Störungswetter, yellow = both, blue-grey = no marker. A ⚠︎ badge marks DHV warnings.
+- Each day is a glass tile. The icon shows the sky as DHV describes it (sun, cloud, showers, rain, snow, Föhn), read from DHV's bold key phrase.
+- When DHV marks a day as Thermikwetter (👍), Störungswetter (👎) or with a Warnhinweis (⚠︎), the tile is tinted green, red or yellow and shows the badge. DHV mostly sets these markers in thermal season; outside it the tiles stay blue-grey.
 - Columns are matched by date and labelled from the real date (Today / Tomorrow / weekday), so they roll over at midnight and never show yesterday as "Today".
 - With a **Clear** or **Tinted** Home Screen (long-press the Home Screen → Edit → Customize) iOS renders the widget in its Liquid Glass style; icons and labels stay readable there because the rating is also shown as a symbol (☀︎ / ⛅︎ / 🌧).
 - The widget refreshes shortly after DHV's announced next update (morning ~7–8 h, evening ~18–19 h) and at least every 3 hours, as far as iOS's widget budget allows. Opening the app refreshes everything immediately.
@@ -52,7 +53,7 @@ Requires Xcode 26 (iOS 26 SDK).
 ios/
 ├── project.yml        XcodeGen project (app + widget extension)
 ├── DHVKit/            Swift package: DHV page parser, model, cache, tests
-│   └── Sources/dhv-check   `swift run dhv-check` prints the live forecast as parsed
+│   └── Sources/dhv-check   `swift run dhv-check` prints the live forecast as parsed (`--html` dumps the raw markup)
 ├── App/               SwiftUI host app
 ├── Widget/            WidgetKit extension
 └── Shared/            Colours and symbols used by both

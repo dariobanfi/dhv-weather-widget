@@ -162,12 +162,16 @@ struct DayCard: View {
                             .padding(.vertical, 4)
                             .glassEffect(.regular, in: .capsule)
                     }
-                    Label(day.rating.label, systemImage: day.rating.symbol)
-                        .font(.caption.weight(.semibold))
+                    if day.rating != .neutral {
+                        Label(day.rating.label, systemImage: day.rating.symbol)
+                            .font(.caption.weight(.semibold))
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .glassEffect(.regular.tint(day.tint.opacity(0.55)), in: .capsule)
+                    }
+                    Image(systemName: day.sky.symbol)
+                        .font(.title)
                         .symbolRenderingMode(.multicolor)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 5)
-                        .glassEffect(.regular.tint(day.tint.opacity(0.55)), in: .capsule)
                 }
             }
 
@@ -176,8 +180,8 @@ struct DayCard: View {
                 .fixedSize(horizontal: false, vertical: true)
 
             if let summary = day.summary {
-                Text(summary)
-                    .font(.body.weight(.medium))
+                Text(Self.highlighted(summary, emphasis: day.emphasis))
+                    .font(.body)
             }
             ForEach(day.details, id: \.self) { detail in
                 Text(detail)
@@ -204,6 +208,17 @@ struct DayCard: View {
         .padding(18)
         .frame(maxWidth: .infinity, alignment: .leading)
         .glassEffect(.regular.tint(day.tint.opacity(0.22)), in: .rect(cornerRadius: 30))
+    }
+
+    /// The summary with DHV's bold key phrases kept bold.
+    static func highlighted(_ text: String, emphasis: [String]) -> AttributedString {
+        var result = AttributedString(text)
+        for phrase in emphasis {
+            if let range = result.range(of: phrase) {
+                result[range].inlinePresentationIntent = .stronglyEmphasized
+            }
+        }
+        return result
     }
 }
 

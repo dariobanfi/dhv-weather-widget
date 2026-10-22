@@ -14,7 +14,7 @@ final class ParserTests: XCTestCase {
     }
 
     func testParsesAllRegionsWithTheirOwnDayCounts() throws {
-        let f = try DHVParser(now: date(2026, 10, 22, 9)).parse(html: fixture("dhv-wetter"))
+        let f = try DHVParser(now: date(2026, 10, 22, 9)).parse(html: fixture("legacy-paragraphs"))
         XCTAssertEqual(f.regions.map(\.region), [.deutschland, .nordalpen, .suedalpen])
         XCTAssertEqual(f.regions.map(\.days.count), [2, 3, 3])
         XCTAssertEqual(f.issuedAt, date(2026, 10, 22, 7))
@@ -22,7 +22,7 @@ final class ParserTests: XCTestCase {
     }
 
     func testDayContent() throws {
-        let f = try DHVParser(now: date(2026, 10, 22, 9)).parse(html: fixture("dhv-wetter"))
+        let f = try DHVParser(now: date(2026, 10, 22, 9)).parse(html: fixture("legacy-paragraphs"))
         let de = try XCTUnwrap(f.region(.deutschland))
         XCTAssertEqual(de.days[0].date, date(2026, 10, 22))
         XCTAssertEqual(de.days[0].headline, "Durchwachsen, zunehmend sehr windig")
@@ -38,7 +38,7 @@ final class ParserTests: XCTestCase {
     }
 
     func testSignalsAreAggregatedNotOverwritten() throws {
-        let f = try DHVParser(now: date(2026, 10, 22, 9)).parse(html: fixture("dhv-wetter"))
+        let f = try DHVParser(now: date(2026, 10, 22, 9)).parse(html: fixture("legacy-paragraphs"))
         let nord = try XCTUnwrap(f.region(.nordalpen))
         // thumbs-up paragraph followed by an exclamation paragraph: the old
         // Android code kept only the last class and lost the thermal rating.
@@ -65,7 +65,7 @@ final class ParserTests: XCTestCase {
     }
 
     func testLabelsFollowTheRealDate() throws {
-        let f = try DHVParser(now: date(2026, 10, 22, 9)).parse(html: fixture("dhv-wetter"))
+        let f = try DHVParser(now: date(2026, 10, 22, 9)).parse(html: fixture("legacy-paragraphs"))
         // Evening of the 22nd, then after midnight: "Today" must move on.
         let evening = date(2026, 10, 22, 21)
         XCTAssertEqual(f.upcomingDates(from: evening).map { DayLabel.text(for: $0, now: evening) },
@@ -85,5 +85,65 @@ final class ParserTests: XCTestCase {
         let afternoon = date(2026, 10, 22, 17)
         XCTAssertEqual(ForecastLoader.nextRefresh(after: f, now: afternoon, failed: false), date(2026, 10, 22, 18, 45))
         XCTAssertEqual(ForecastLoader.nextRefresh(after: f, now: now, failed: true), date(2026, 10, 22, 9, 30))
+    }
+
+    // MARK: - Live markup (22.10.2026)
+
+    func live() throws -> Forecast {
+        try DHVParser(now: date(2026, 10, 22, 16, 30)).parse(html: fixture("dhv-wetter-2026-10-22"))
+    }
+
+    func testLiveStandAndNextUpdate() throws {
+        let f = try live()
+        XCTAssertEqual(f.issuedAt, date(2026, 10, 22, 16))
+        XCTAssertEqual(f.nextUpdateAt, date(2026, 10, 23, 8))
+        XCTAssertEqual(f.regions.map(\.region), [.nordalpen, .suedalpen])
+        XCTAssertEqual(f.regions.map(\.days.count), [4, 4])
+    }
+
+    func testLiveDaySplitsSummaryNotesAndWind() throws {
+        let nord = try XCTUnwrap(try live().region(.nordalpen))
+        let fr = nord.days[0]
+        XCTAssertEqual(fr.headline, "Föhnig, nächste Front im Westen")
+        XCTAssertEqual(fr.summary, "Mit vielen As/Ci-Feldern föhnig +/- aufgelockert, nachmittags ganz im Westen zunehmend stark bewölkt, abends/nachts regnerischer Frontdurchgang.")
+        XCTAssertEqual(fr.emphasis, ["Mit vielen As/Ci-Feldern föhnig +/- aufgelockert"])
+        XCTAssertEqual(fr.wind, "Meist deutlich auflebender Süd- bis WSW-Wind, föhnig.")
+        XCTAssertEqual(fr.details, [])
+        XCTAssertEqual(fr.sky, .foehn)
+        XCTAssertEqual(nord.days[1].sky, .showers)
+        XCTAssertEqual(nord.days[2].sky, .rain)
+        XCTAssertTrue(nord.days[2].isStormy)
+        XCTAssertEqual(nord.days[3].sky, .partlyCloudy)
+
+        let sued = try XCTUnwrap(try live().region(.suedalpen))
+        XCTAssertEqual(sued.days[0].details, ["Bassano: Im Tagesverlauf zunehmend wolkig, daher eher mäßige Thermik/Basishöhe. Nachmittags aufkommende Abschattungen."])
+        XCTAssertEqual(sued.days[2].wind, "Meist mäßiger SW-Wind, inneralpin oberhalb 2200mNN zunehmend auflebender Westwind.")
+    }
+
+    func testLiveTrendAndMidWordBold() throws {
+        let sued = try XCTUnwrap(try live().region(.suedalpen))
+        let sa = sued.days[1]
+        XCTAssertTrue(sa.isTrend)
+        XCTAssertEqual(sa.summary?.hasPrefix("Richtung Westen mit Nordföhn aufgelockert, sonst wechselnd"), true)
+        XCTAssertEqual(sa.emphasis, ["sonst wechselnd bewölkt mit Nordföhn. In SLO (evtl. auch bis Bassano) noch stark bewölkt, ostwindig und regnerisch"])
+        XCTAssertEqual(sa.details.first?.hasPrefix("Bassano: --."), true)
+        let mo = sued.days[3]
+        XCTAssertTrue(mo.isTrend)
+        XCTAssertEqual(mo.summary, "Meist freundlich.")
+        XCTAssertEqual(mo.sky, .sunny)
+        XCTAssertFalse(sued.days[0].isTrend)
+    }
+
+    func testLegendMarkersDoNotLeakIntoDays() throws {
+        let f = try live()
+        XCTAssertTrue(f.regions.flatMap(\.days).allSatisfy { $0.signals.isEmpty && $0.rating == .neutral })
+    }
+
+    func testEveningUpdateStartsTomorrow() throws {
+        // After the 16:00 update the page no longer lists Thursday: the first
+        // column must read "Tomorrow", not "Today" as the Android widget showed.
+        let f = try live()
+        let now = date(2026, 10, 22, 17)
+        XCTAssertEqual(f.upcomingDates(from: now).map { DayLabel.text(for: $0, now: now) }, ["Tomorrow", "Saturday", "Sunday"])
     }
 }

@@ -117,27 +117,92 @@ public struct DHVParser {
 
     // MARK: - Paragraphs
 
+    /// DHV writes a day as one paragraph whose lines are separated by `<br>`:
+    /// the summary (key phrase in `<strong>`), optional site notes such as
+    /// "Bassano: …", and "Wind: …". Older markup used one `<p>` per line;
+    /// both shapes end up as the same lines here.
     private func add(paragraph el: Element, text: String, to day: inout DayForecast) {
         day.signals.formUnion(signals(of: el))
 
-        if let range = text.range(of: #"^Wind\s*:\s*"#, options: [.regularExpression, .caseInsensitive]) {
-            let wind = String(text[range.upperBound...])
-            day.wind = day.wind.map { "\($0) \(wind)" } ?? wind
-            return
-        }
-        if text.range(of: #"^TREND\b"#, options: [.regularExpression, .caseInsensitive]) != nil {
-            day.isTrend = true
-        }
+        for runs in Self.lines(of: el) {
+            let line = Self.clean(runs.map(\.text).joined())
+            if line.isEmpty { continue }
 
-        // The first paragraph that opens with a bold sentence is the day's
-        // summary. Short bold labels such as "Bassano:" stay details.
-        let bold = Self.clean((try? el.select("strong, b").text()) ?? "")
-        if day.summary == nil, bold.count >= 12, text.hasPrefix(String(bold.prefix(12))),
-           Double(bold.count) >= Double(text.count) * 0.5 {
-            day.summary = text
-            return
+            if let range = line.range(of: #"^Wind\s*:\s*"#, options: [.regularExpression, .caseInsensitive]) {
+                let wind = String(line[range.upperBound...])
+                day.wind = day.wind.map { "\($0) \(wind)" } ?? wind
+                continue
+            }
+
+            var body = line
+            if let range = line.range(of: #"^TREND\b\s*:?\s*"#, options: [.regularExpression, .caseInsensitive]) {
+                day.isTrend = true
+                body = String(line[range.upperBound...])
+                if body.isEmpty { continue }
+            }
+
+            // "Bassano: …", "Dolomiten: …" are notes for a single site.
+            let isSiteNote = body.range(of: #"^[A-ZÄÖÜ][\p{L}/ .-]{1,24}:\s"#, options: .regularExpression) != nil
+            if day.summary == nil, !isSiteNote {
+                day.summary = body
+                day.emphasis = Self.emphasis(in: runs)
+            } else {
+                day.details.append(body)
+            }
         }
-        day.details.append(text)
+    }
+
+    struct Run: Equatable {
+        var text: String
+        var bold: Bool
+    }
+
+    /// Splits an element's content into lines at `<br>`, keeping which parts are bold.
+    static func lines(of el: Element) -> [[Run]] {
+        var lines: [[Run]] = [[]]
+        func walk(_ node: Node, bold: Bool) {
+            if let text = node as? TextNode {
+                lines[lines.count - 1].append(Run(text: text.getWholeText(), bold: bold))
+            } else if let e = node as? Element {
+                let tag = e.tagName().lowercased()
+                if tag == "br" { lines.append([]); return }
+                let isBold = bold || tag == "strong" || tag == "b"
+                for child in e.getChildNodes() { walk(child, bold: isBold) }
+            }
+        }
+        for child in el.getChildNodes() { walk(child, bold: false) }
+        return lines.filter { !$0.isEmpty }
+    }
+
+    /// The bold phrases DHV highlights in a line. A highlight that starts or
+    /// ends inside a word ("sons<strong>t wechselnd</strong>") is widened to
+    /// the whole word; the "TREND" label is dropped.
+    static func emphasis(in runs: [Run]) -> [String] {
+        var phrases: [String] = []
+        var i = 0
+        while i < runs.count {
+            guard runs[i].bold else { i += 1; continue }
+            var phrase = ""
+            let start = i
+            while i < runs.count, runs[i].bold { phrase += runs[i].text; i += 1 }
+
+            if start > 0, let first = phrase.first, first.isLetter {
+                let before = runs[start - 1].text
+                let prefix = before.reversed().prefix { $0.isLetter }
+                phrase = String(prefix.reversed()) + phrase
+            }
+            if i < runs.count, let last = phrase.last, last.isLetter {
+                phrase += runs[i].text.prefix { $0.isLetter }
+            }
+
+            var cleaned = clean(phrase)
+            if let r = cleaned.range(of: #"^TREND\b\s*:?\s*"#, options: [.regularExpression, .caseInsensitive]) {
+                cleaned = String(cleaned[r.upperBound...])
+            }
+            cleaned = cleaned.trimmingCharacters(in: CharacterSet(charactersIn: " :,"))
+            if cleaned.count >= 3 { phrases.append(cleaned) }
+        }
+        return phrases
     }
 
     /// Reads markers from class names, image sources and data attributes of
@@ -181,23 +246,29 @@ public struct DHVParser {
         return (date, headline)
     }
 
-    private static let dateTimeRegex = try! NSRegularExpression(
-        pattern: #"(\d{1,2})\.(\d{1,2})\.(\d{2,4})\s*[-–]\s*(\d{1,2})[:.](\d{2})"#
+    private static let standRegex = try! NSRegularExpression(
+        pattern: #"Stand\s*:?\s*(?:[A-Za-z]{2}\.?\s*)?(\d{1,2})\.(\d{1,2})\.(\d{2,4})\s*[-–]\s*(\d{1,2})[:.](\d{2})"#,
+        options: [.caseInsensitive]
+    )
+    private static let nextUpdateRegex = try! NSRegularExpression(
+        pattern: #"Aktualisierung\s*:?\s*(?:[A-Za-z]{2}\.?\s*)?(\d{1,2})\.(\d{1,2})\.(\d{2,4})\s*[-–]\s*(\d{1,2})[:.](\d{2})"#,
+        options: [.caseInsensitive]
     )
 
-    /// Finds "Stand: Do. 22.10.26 - 07:00 h" and the next announced update.
+    /// Reads "Stand: Do. 22.10.26 - 16:00 h" and
+    /// "Nächste Aktualisierung: Fr. 23.10.26 - 08:00 h".
     func parseStand(in text: String) -> (Date?, Date?) {
-        guard let standRange = text.range(of: "Stand", options: .caseInsensitive) else { return (nil, nil) }
-        let tail = String(text[standRange.lowerBound...])
-        let ns = tail as NSString
-        let matches = Self.dateTimeRegex.matches(in: tail, range: NSRange(location: 0, length: min(ns.length, 400)))
-        let dates: [Date] = matches.compactMap { m in
+        func first(_ regex: NSRegularExpression) -> Date? {
+            let ns = text as NSString
+            guard let m = regex.firstMatch(in: text, range: NSRange(location: 0, length: ns.length)) else { return nil }
             let g = (1...5).map { Int(ns.substring(with: m.range(at: $0))) }
             guard let d = g[0], let mo = g[1], let y = g[2], let h = g[3], let mi = g[4] else { return nil }
             return makeDate(day: d, month: mo, year: y, hour: h, minute: mi, reference: now)
         }
-        guard let issued = dates.first else { return (nil, nil) }
-        return (issued, dates.dropFirst().first { $0 > issued })
+        let issued = first(Self.standRegex)
+        var next = first(Self.nextUpdateRegex)
+        if let n = next, let i = issued, n <= i { next = nil }
+        return (issued, next)
     }
 
     func makeDate(day: Int, month: Int, year: Int?, hour: Int, minute: Int, reference: Date) -> Date? {

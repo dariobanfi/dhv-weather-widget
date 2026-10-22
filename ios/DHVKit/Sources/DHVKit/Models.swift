@@ -57,8 +57,10 @@ public struct DayForecast: Codable, Equatable, Sendable, Identifiable {
     public var date: Date
     /// Headline from the day heading, e.g. "Zwischenhoch, +/- windig".
     public var headline: String
-    /// The bold summary sentence, if DHV gave one.
+    /// The day's summary line (first line of the forecast text).
     public var summary: String?
+    /// The phrases DHV set in bold inside the summary: its key message.
+    public var emphasis: [String]
     /// Remaining paragraphs in order (e.g. Bassano notes, TREND text).
     public var details: [String]
     /// Text after "Wind:".
@@ -69,11 +71,12 @@ public struct DayForecast: Codable, Equatable, Sendable, Identifiable {
 
     public var id: Date { date }
 
-    public init(date: Date, headline: String, summary: String? = nil, details: [String] = [],
+    public init(date: Date, headline: String, summary: String? = nil, emphasis: [String] = [], details: [String] = [],
                 wind: String? = nil, isTrend: Bool = false, signals: Set<Signal> = []) {
         self.date = date
         self.headline = headline
         self.summary = summary
+        self.emphasis = emphasis
         self.details = details
         self.wind = wind
         self.isTrend = isTrend
@@ -90,6 +93,50 @@ public struct DayForecast: Codable, Equatable, Sendable, Identifiable {
     }
 
     public var hasWarning: Bool { signals.contains(.warning) }
+
+    /// Short text for tight layouts: DHV's bold key phrase, else the headline.
+    public var keyPhrase: String {
+        emphasis.isEmpty ? headline : emphasis.joined(separator: " … ")
+    }
+
+    /// Sky condition read from DHV's own wording (key phrase first, then the
+    /// summary, then the headline). Only picks the icon; the rating colour
+    /// comes solely from DHV's markers.
+    public var sky: Sky {
+        for text in [emphasis.joined(separator: " "), summary ?? "", headline] {
+            if let sky = Sky.classify(text) { return sky }
+        }
+        return .unknown
+    }
+
+    /// "sehr windig", "stürmisch", "Sturm", "starker … Wind".
+    public var isStormy: Bool {
+        let t = [headline, summary ?? "", wind ?? ""].joined(separator: " ").lowercased()
+        return ["sehr windig", "stürm", "sturm", "sehr stark"].contains { t.contains($0) }
+    }
+}
+
+public enum Sky: String, Codable, Sendable {
+    case thunder, snow, rain, showers, overcast, fog, foehn, partlyCloudy, sunny, unknown
+
+    /// Most severe condition mentioned wins, so "stark bewölkt, aufkommender
+    /// Regen" reads as rain.
+    static func classify(_ text: String) -> Sky? {
+        let t = text.lowercased()
+        guard !t.isEmpty else { return nil }
+        let rules: [(Sky, [String])] = [
+            (.thunder, ["gewitter"]),
+            (.snow, ["schnee"]),
+            (.rain, ["regen", "regnerisch", "niederschl"]),
+            (.showers, ["schauer"]),
+            (.overcast, ["stark bewölkt", "bedeckt", "dicht bewölkt", "trüb"]),
+            (.fog, ["nebel"]),
+            (.foehn, ["föhn"]),
+            (.partlyCloudy, ["aufgelockert", "wolkig", "bewölkt", "ac/ci", "as/ci", "wechselhaft", "wechselnd"]),
+            (.sunny, ["sonnig", "freundlich", "wolkenlos", "klar", "hochdruck", "hoch "]),
+        ]
+        return rules.first { _, words in words.contains { t.contains($0) } }?.0
+    }
 }
 
 public struct RegionForecast: Codable, Equatable, Sendable, Identifiable {

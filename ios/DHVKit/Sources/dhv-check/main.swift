@@ -38,9 +38,10 @@ do {
         for day in region.days {
             let label = DayLabel.text(for: day.date, now: .now)
             let marks = day.signals.map(\.rawValue).sorted().joined(separator: ",")
-            print("  \(label) [\(day.rating.rawValue)\(marks.isEmpty ? "" : " " + marks)]\(day.isTrend ? " TREND" : "")")
+            print("  \(label) [\(day.rating.rawValue)\(marks.isEmpty ? "" : " " + marks)] sky=\(day.sky.rawValue)\(day.isStormy ? " stormy" : "")\(day.isTrend ? " TREND" : "")")
             print("    headline: \(day.headline)")
             if let s = day.summary { print("    summary:  \(s)") }
+            if !day.emphasis.isEmpty { print("    key:      \(day.emphasis.joined(separator: " | "))") }
             for d in day.details { print("    detail:   \(d)") }
             if let w = day.wind { print("    wind:     \(w)") }
         }
