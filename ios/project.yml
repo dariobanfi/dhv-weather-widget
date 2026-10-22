@@ -88,3 +88,29 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.dariobanfi.dhvweather.widget
+
+  # Drives SpringBoard to screenshot the real widgets on the simulator's Home
+  # Screen in each appearance (see UITests/HomeScreenShots.swift). CI only.
+  DHVWeatherUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - UITests
+    dependencies:
+      - target: DHVWeather
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.dariobanfi.dhvweather.uitests
+        TEST_TARGET_NAME: DHVWeather
+        GENERATE_INFOPLIST_FILE: YES
+
+schemes:
+  HomeScreenShots:
+    build:
+      targets:
+        DHVWeather: all
+        DHVWeatherUITests: [test]
+    test:
+      config: Debug
+      targets:
+        - DHVWeatherUITests

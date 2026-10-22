@@ -156,20 +156,44 @@ jobs:
           shoot light home home-sample-markers sample
           ls -l screenshots
 
+      - name: Real Home Screen (SpringBoard UI test)
+        # Adds the widgets to the simulator's Home Screen and screenshots them in
+        # Default, Dark, Clear and Tinted, i.e. what iOS itself draws, Liquid
+        # Glass included. SpringBoard isn't an API, so this never blocks CI.
+        continue-on-error: true
+        timeout-minutes: 15
+        run: |
+          xcrun simctl ui "$UDID" appearance light
+          mkdir -p screenshots/home-screen
+          set -o pipefail
+          xcodebuild test \
+            -project DHVWeather.xcodeproj \
+            -scheme HomeScreenShots \
+            -destination "id=$UDID" \
+            -derivedDataPath build/dd \
+            CODE_SIGNING_ALLOWED=NO \
+            TEST_RUNNER_SHOTS_DIR="$PWD/screenshots/home-screen" \
+            2>&1 | tee build/uitest.log | grep -E 'HOMESHOT|error|Test Case|\*\* TEST' || true
+          echo "--- accessibility dumps ---"
+          grep -n -A 120 'HOMESHOT missing' build/uitest.log | head -1500 || true
+          ls -l screenshots/home-screen
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: widget-screenshots
           path: |
-            ios/screenshots/*.png
+            ios/screenshots/**/*.png
             ios/build/sim.log
+            ios/build/uitest.log
           retention-days: 30
 
       - name: Commit screenshots to assets/ios
         if: github.event_name == 'workflow_dispatch' && inputs.commit_screenshots
         run: |
           mkdir -p ../assets/ios
-          for f in screenshots/*.png; do
+          for f in screenshots/*.png screenshots/home-screen/hs-*.png; do
+            [ -f "$f" ] || continue
             sips --resampleWidth 603 "$f" --out "../assets/ios/$(basename "$f")" >/dev/null
           done
           cd ..

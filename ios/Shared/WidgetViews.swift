@@ -4,44 +4,38 @@ import WidgetKit
 
 // MARK: - Building blocks
 
-/// A tinted Liquid Glass tile. In full colour it uses real glass tinted by the
-/// day's rating; on a tinted or clear Home Screen the system recolours
-/// everything, so it falls back to a hairline outline and lets the glass
-/// container do the work.
-struct GlassTile: ViewModifier {
-    var tint: Color
-    var cornerRadius: CGFloat = 12
+/// A day tile: a plain grouping shape, concentric with the widget's corners.
+///
+/// Apple's widget guidance leaves the glass to the system: on a Clear Home
+/// Screen iOS renders the widget in accented mode, removes the container
+/// background and draws real Liquid Glass behind the content. A custom glass
+/// effect doesn't render inside a widget, so tiles stay flat fills: tinted by
+/// DHV's marker in full colour, a faint neutral fill in accented mode (which
+/// iOS tints white and lays over its glass).
+struct DayTile: ViewModifier {
+    /// DHV's marker colour, or nil for an untinted (neutral or empty) tile.
+    var tint: Color?
+    var emphasis: Double = 1
     @Environment(\.widgetRenderingMode) private var mode
+    @Environment(\.colorScheme) private var scheme
 
-    @ViewBuilder
     func body(content: Content) -> some View {
-        let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-        if mode == .fullColor {
-            content
-                .background {
-                    shape.fill(LinearGradient(colors: [tint.opacity(0.46), tint.opacity(0.16)],
-                                              startPoint: .topLeading, endPoint: .bottomTrailing))
-                }
-                .glassEffect(.regular.tint(tint.opacity(0.18)), in: shape)
-                .overlay {
-                    // Specular rim: bright top-left edge fading out.
-                    shape.strokeBorder(
-                        LinearGradient(colors: [.white.opacity(0.6), .white.opacity(0.06), .white.opacity(0.22)],
-                                       startPoint: .topLeading, endPoint: .bottomTrailing),
-                        lineWidth: 0.8
-                    )
-                }
-        } else {
-            content
-                .background { shape.fill(.white.opacity(0.08)) }
-                .overlay { shape.strokeBorder(.white.opacity(0.28), lineWidth: 0.6) }
+        content.background {
+            ConcentricRectangle(corners: .concentric(minimum: 10), isUniform: true)
+                .fill(fill.opacity(emphasis))
         }
+    }
+
+    private var fill: Color {
+        guard mode == .fullColor else { return .white.opacity(0.12) }
+        if let tint { return tint.opacity(scheme == .dark ? 0.34 : 0.40) }
+        return .white.opacity(scheme == .dark ? 0.10 : 0.17)
     }
 }
 
 extension View {
-    func glassTile(_ tint: Color, cornerRadius: CGFloat = 12) -> some View {
-        modifier(GlassTile(tint: tint, cornerRadius: cornerRadius))
+    func dayTile(_ day: DayForecast?, emphasis: Double = 1) -> some View {
+        modifier(DayTile(tint: day.flatMap { $0.rating == .neutral ? nil : $0.tint }, emphasis: emphasis))
     }
 }
 
@@ -197,14 +191,12 @@ struct OverviewView: View {
                             if let day = region.day(on: date) {
                                 if isLarge { LargeCell(day: day) } else { MediumCell(day: day) }
                             } else {
-                                // No forecast for this region on that day: a quiet placeholder, not a glass tile.
-                                let shape = RoundedRectangle(cornerRadius: isLarge ? 14 : 10, style: .continuous)
+                                // No forecast for this region on that day: a fainter, empty tile.
                                 Text("—")
                                     .font(.caption2)
                                     .opacity(0.5)
                                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                    .background { shape.fill(.white.opacity(0.06)) }
-                                    .overlay { shape.strokeBorder(.white.opacity(0.18), lineWidth: 0.6) }
+                                    .dayTile(nil, emphasis: 0.5)
                             }
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -213,7 +205,7 @@ struct OverviewView: View {
             }
         }
         .foregroundStyle(.white)
-        .padding(isLarge ? 14 : 10)
+        .padding(isLarge ? 14 : 11)
     }
 
     private func statusText(_ forecast: Forecast) -> some View {
@@ -244,7 +236,7 @@ struct MediumCell: View {
         .overlay(alignment: .bottomTrailing) {
             DayBadges(day: day, size: 7).padding(3)
         }
-        .glassTile(day.tint, cornerRadius: 10)
+        .dayTile(day)
     }
 }
 
@@ -281,7 +273,7 @@ struct LargeCell: View {
         }
         .padding(7)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .glassTile(day.tint, cornerRadius: 14)
+        .dayTile(day)
     }
 }
 
@@ -387,7 +379,7 @@ struct RegionView: View {
                 }
                 .padding(8)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                .glassTile(today.tint, cornerRadius: 16)
+                .dayTile(today)
 
                 ForEach(days.dropFirst().prefix(2)) { day in
                     HStack(spacing: 4) {
