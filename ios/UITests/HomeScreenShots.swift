@@ -11,6 +11,7 @@ import XCTest
 final class HomeScreenShots: XCTestCase {
     private let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
     private var shots = 0
+    private var loggedCustomize = false
 
     private lazy var outDir: URL = {
         let path = ProcessInfo.processInfo.environment["SHOTS_DIR"] ?? NSTemporaryDirectory()
@@ -59,11 +60,18 @@ final class HomeScreenShots: XCTestCase {
 
     private func enterEditMode() -> Bool {
         if springboard.buttons["Done"].exists { return true }
-        // A long press on an empty spot starts jiggle mode; on an icon it opens
-        // a menu with "Edit Home Screen" instead.
-        springboard.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.80)).press(forDuration: 1.6)
+        // Long-press one of our widgets (or an empty spot before they exist);
+        // the context menu offers "Edit Home Screen". A long press on empty
+        // space goes straight to jiggle mode.
+        let widget = springboard.icons["DHV Wetter"].firstMatch
+        if widget.exists, widget.isHittable {
+            widget.press(forDuration: 1.6)
+        } else {
+            springboard.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.80)).press(forDuration: 1.6)
+        }
         sleep(1)
-        let editHome = springboard.buttons["Edit Home Screen"]
+        let editHome = springboard.descendants(matching: .any)
+            .matching(NSPredicate(format: "label == %@", "Edit Home Screen")).firstMatch
         if editHome.exists { editHome.tap(); sleep(1) }
         if springboard.buttons["Done"].waitForExistence(timeout: 4) { return true }
         dump("enterEditMode")
@@ -137,6 +145,11 @@ final class HomeScreenShots: XCTestCase {
     /// Picks an appearance in Edit → Customize. Returns false if it couldn't.
     private func setAppearance(_ label: String, variant: String? = nil) -> Bool {
         guard openEditMenu("Customize") else { return false }
+        if !loggedCustomize {
+            loggedCustomize = true
+            print("HOMESHOT Customize panel:")
+            print(springboard.debugDescription)
+        }
         var picked = false
         for query in [springboard.buttons, springboard.cells, springboard.staticTexts] {
             let option = query[label]
@@ -152,9 +165,10 @@ final class HomeScreenShots: XCTestCase {
             if toggle.waitForExistence(timeout: 2) { toggle.tap() } else { dump("Customize variant: \(variant)"); picked = false }
         }
         sleep(1)
-        // Close the Customize panel, then leave jiggle mode.
-        springboard.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.06)).tap()
+        // The Home button closes the Customize panel and then ends jiggle mode.
+        XCUIDevice.shared.press(.home)
         sleep(1)
+        if springboard.buttons["Done"].exists { XCUIDevice.shared.press(.home); sleep(1) }
         leaveEditMode()
         return picked
     }
