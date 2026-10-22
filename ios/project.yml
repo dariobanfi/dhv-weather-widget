@@ -1,0 +1,90 @@
+name: DHVWeather
+options:
+  bundleIdPrefix: com.dariobanfi
+  deploymentTarget:
+    iOS: "26.0"
+  createIntermediateGroups: true
+  developmentLanguage: en
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    TARGETED_DEVICE_FAMILY: "1"
+    CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: ""
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+
+packages:
+  DHVKit:
+    path: DHVKit
+
+targets:
+  DHVWeather:
+    type: application
+    platform: iOS
+    sources:
+      - App
+      - Shared
+      - path: Resources/Assets.xcassets
+    dependencies:
+      - package: DHVKit
+        product: DHVKit
+      - target: DHVWidget
+    entitlements:
+      path: App/DHVWeather.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.dariobanfi.dhvweather
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: DHV Wetter
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        UILaunchScreen: {}
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        ITSAppUsesNonExemptEncryption: false
+        CFBundleURLTypes:
+          - CFBundleURLName: com.dariobanfi.dhvweather
+            CFBundleURLSchemes:
+              - dhvweather
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.dariobanfi.dhvweather
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+    scheme:
+      testTargets: []
+
+  DHVWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - Widget
+      - Shared
+    dependencies:
+      - package: DHVKit
+        product: DHVKit
+      - sdk: WidgetKit.framework
+      - sdk: SwiftUI.framework
+    entitlements:
+      path: Widget/DHVWidget.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.dariobanfi.dhvweather
+    info:
+      path: Widget/Info.plist
+      properties:
+        CFBundleDisplayName: DHV Wetter
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.dariobanfi.dhvweather.widget

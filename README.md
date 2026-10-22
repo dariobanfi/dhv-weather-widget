@@ -17,6 +17,10 @@ A modern, Material 3-inspired Android widget and companion app for paragliding p
     *   **App:** Full-screen scrollable view with expandable cards for detailed reading.
 *   **Google Sans Typography:** Optimized to look native on Pixel devices.
 
+## iOS 🍏
+
+A native iOS 26 version with Liquid Glass widgets lives in [`ios/`](ios/). See [ios/README.md](ios/README.md) for the widgets, the unsigned IPA built by CI, and how to sign and install it.
+
 ## Installation 📲
 
 1.  Go to the [Releases](../../releases) page.
