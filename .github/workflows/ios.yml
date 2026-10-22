@@ -13,6 +13,10 @@ on:
         description: Commit the widget screenshots to assets/ios on this branch
         type: boolean
         default: false
+      widget_flags:
+        description: Extra compile conditions for the Home Screen test build (e.g. SAMPLE_FORECAST)
+        type: string
+        default: SAMPLE_FORECAST
       commit_debug:
         description: Also commit the Home Screen test's debug frames to assets/ios/debug
         type: boolean
@@ -166,6 +170,9 @@ jobs:
         # Glass included. SpringBoard isn't an API, so this never blocks CI.
         continue-on-error: true
         timeout-minutes: 25
+        env:
+          # The sample forecast shows every DHV marker, so the shots show how ratings look.
+          WIDGET_FLAGS: ${{ inputs.widget_flags || 'SAMPLE_FORECAST' }}
         run: |
           xcrun simctl ui "$UDID" appearance light
           mkdir -p screenshots/home-screen
@@ -177,6 +184,7 @@ jobs:
             -destination "id=$UDID" \
             -derivedDataPath build/dd \
             CODE_SIGNING_ALLOWED=NO \
+            SWIFT_ACTIVE_COMPILATION_CONDITIONS="DEBUG ${WIDGET_FLAGS}" \
             2>&1 | tee build/uitest.log | grep -E 'HOMESHOT|error|Test Case|\*\* TEST' || true
           echo "--- accessibility dumps ---"
           grep -n -A 60 'HOMESHOT missing\|HOMESHOT Customize' build/uitest.log | grep -v 'Icon, .*{{0.0, 0.0}, {0.0, 0.0}}' | head -1500 || true

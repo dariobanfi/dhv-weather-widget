@@ -1,5 +1,6 @@
 import DHVKit
 import SwiftUI
+import UIKit
 import WidgetKit
 
 // MARK: - Building blocks
@@ -7,15 +8,19 @@ import WidgetKit
 /// A day tile: a plain grouping shape whose corners follow the widget's own
 /// (about 26 pt on iPhone) minus the content margin.
 ///
-/// Apple's widget guidance leaves the glass to the system: on a Clear Home
-/// Screen iOS renders the widget in accented mode, removes the container
-/// background and draws real Liquid Glass behind the content. A custom glass
-/// effect doesn't render inside a widget, so tiles stay flat fills: tinted by
-/// DHV's marker in full colour, a faint neutral fill in accented mode (which
-/// iOS tints white and lays over its glass).
+/// Apple's widget guidance leaves the glass to the system: on a Clear or
+/// Tinted Home Screen iOS renders the widget in accented mode, removes the
+/// container background, draws Liquid Glass or the tint behind the content
+/// and turns every colour white. To keep DHV's rating readable there:
+/// - the rating colour is drawn as an image marked
+///   `widgetAccentedRenderingMode(.fullColor)`, the documented way to keep an
+///   image's colour in accented mode (checked on the simulator's Home Screen:
+///   green, yellow and red survive in Clear and Tinted, a plain fill doesn't);
+/// - good days are drawn a little stronger and each rated day carries its
+///   symbol, so the rating still reads if a future iOS whitens images too.
 struct DayTile: ViewModifier {
-    /// DHV's marker colour, or nil for an untinted (neutral or empty) tile.
-    var tint: Color?
+    /// DHV's rating, or nil for an empty slot.
+    var rating: Rating?
     var emphasis: Double = 1
     @Environment(\.widgetRenderingMode) private var mode
     @Environment(\.colorScheme) private var scheme
@@ -24,21 +29,51 @@ struct DayTile: ViewModifier {
         content.background {
             // Same radius for every tile: a concentric shape would square off
             // the inner tiles of the grid.
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(fill.opacity(emphasis))
+            let shape = RoundedRectangle(cornerRadius: 12, style: .continuous)
+            if mode != .fullColor, let rating, rating != .neutral {
+                Swatch.image(rating.tint)
+                    .resizable()
+                    .widgetAccentedRenderingMode(.fullColor)
+                    .opacity(accentedStrength(rating) * emphasis)
+                    .clipShape(shape)
+            } else {
+                shape.fill(fill.opacity(emphasis))
+            }
         }
     }
 
     private var fill: Color {
-        guard mode == .fullColor else { return .white.opacity(0.12) }
-        if let tint { return tint.opacity(scheme == .dark ? 0.34 : 0.40) }
+        guard mode == .fullColor else { return .white.opacity(0.10) }
+        if let rating, rating != .neutral { return rating.tint.opacity(scheme == .dark ? 0.42 : 0.48) }
         return .white.opacity(scheme == .dark ? 0.10 : 0.17)
+    }
+
+    private func accentedStrength(_ rating: Rating) -> Double {
+        switch rating {
+        case .good: 0.62
+        case .mixed: 0.58
+        case .poor: 0.55
+        case .neutral: 0.10
+        }
+    }
+}
+
+/// A solid colour as a bitmap. Unlike a fill, an image can opt out of the
+/// accented whitening with `widgetAccentedRenderingMode(.fullColor)`.
+enum Swatch {
+    static func image(_ color: Color) -> Image {
+        let size = CGSize(width: 4, height: 4)
+        let bitmap = UIGraphicsImageRenderer(size: size).image { context in
+            UIColor(color).setFill()
+            context.fill(CGRect(origin: .zero, size: size))
+        }
+        return Image(uiImage: bitmap)
     }
 }
 
 extension View {
     func dayTile(_ day: DayForecast?, emphasis: Double = 1) -> some View {
-        modifier(DayTile(tint: day.flatMap { $0.rating == .neutral ? nil : $0.tint }, emphasis: emphasis))
+        modifier(DayTile(rating: day?.rating, emphasis: emphasis))
     }
 }
 
@@ -136,6 +171,13 @@ struct OverviewView: View {
     private var family: WidgetFamily { familyOverride ?? environmentFamily }
 
     var body: some View {
+        content
+        .containerBackground(for: .widget) { SkyBackground() }
+        .widgetURL(URL(string: "dhvweather://"))
+    }
+
+    @ViewBuilder
+    private var content: some View {
         Group {
             if let forecast = entry.forecast, !forecast.upcomingDates(from: entry.date).isEmpty {
                 grid(forecast)
@@ -143,8 +185,6 @@ struct OverviewView: View {
                 EmptyState(entry: entry)
             }
         }
-        .containerBackground(for: .widget) { SkyBackground() }
-        .widgetURL(URL(string: "dhvweather://"))
     }
 
     private var isLarge: Bool { family == .systemLarge }
@@ -225,20 +265,22 @@ struct MediumCell: View {
     var day: DayForecast
 
     var body: some View {
-        HStack(alignment: .top, spacing: 3) {
-            SkyIcon(day: day, size: 10)
+        // Icons on their own row, so the badges never sit on the text.
+        VStack(alignment: .leading, spacing: 1) {
+            HStack(spacing: 3) {
+                SkyIcon(day: day, size: 10)
+                Spacer(minLength: 0)
+                DayBadges(day: day, size: 10)
+            }
             Text(day.headline)
                 .font(.system(size: 9.5, weight: .semibold))
-                .lineLimit(3)
+                .lineLimit(2)
                 .minimumScaleFactor(0.75)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(.horizontal, 5)
         .padding(.vertical, 4)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .overlay(alignment: .bottomTrailing) {
-            DayBadges(day: day, size: 7).padding(3)
-        }
         .dayTile(day)
     }
 }
@@ -251,7 +293,7 @@ struct LargeCell: View {
             HStack(alignment: .top, spacing: 4) {
                 SkyIcon(day: day, size: 12)
                 Spacer(minLength: 0)
-                DayBadges(day: day, size: 9)
+                DayBadges(day: day, size: 11)
             }
             Text(day.headline)
                 .font(.system(size: 11, weight: .bold))
@@ -373,7 +415,7 @@ struct RegionView: View {
                             .font(.system(size: 10, weight: .semibold))
                             .opacity(0.85)
                         Spacer(minLength: 0)
-                        DayBadges(day: today, size: 9)
+                        DayBadges(day: today, size: 11)
                     }
                     Text(today.headline)
                         .font(.system(size: 12.5, weight: .bold))
@@ -404,3 +446,4 @@ struct RegionView: View {
         }
     }
 }
+
