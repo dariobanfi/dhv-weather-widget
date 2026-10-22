@@ -69,6 +69,13 @@ enum Swatch {
         }
         return Image(uiImage: bitmap)
     }
+
+    /// An SF Symbol baked into a bitmap in one colour, so accented mode can't recolour it.
+    static func symbol(_ name: String, _ color: Color) -> Image {
+        let config = UIImage.SymbolConfiguration(pointSize: 40, weight: .bold)
+        guard let symbol = UIImage(systemName: name, withConfiguration: config) else { return image(color) }
+        return Image(uiImage: symbol.withTintColor(UIColor(color), renderingMode: .alwaysOriginal))
+    }
 }
 
 extension View {
@@ -468,7 +475,7 @@ struct TintLab: View {
             }
             row("B sym") { r in
                 Image(systemName: "square.fill").resizable()
-                    .foregroundStyle(r.tint).widgetAccentedRenderingMode(.fullColor)
+                    .widgetAccentedRenderingMode(.fullColor).foregroundStyle(r.tint)
             }
             row("C fill") { r in
                 Rectangle().fill(r.tint)
@@ -477,8 +484,8 @@ struct TintLab: View {
                 Color.clear.glassEffect(.regular.tint(r.tint), in: .rect(cornerRadius: 6))
             }
             row("E icon") { r in
-                Image(systemName: r.symbol).resizable().scaledToFit()
-                    .foregroundStyle(r.tint).widgetAccentedRenderingMode(.fullColor)
+                Swatch.symbol(r.symbol, r.tint).resizable()
+                    .widgetAccentedRenderingMode(.fullColor).scaledToFit()
             }
         }
         .padding(10)
