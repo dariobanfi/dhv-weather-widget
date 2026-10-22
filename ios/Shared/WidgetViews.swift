@@ -132,7 +132,11 @@ private func regionURL(_ region: RegionID) -> URL? {
 
 struct OverviewView: View {
     var entry: ForecastEntry
-    @Environment(\.widgetFamily) private var family
+    /// Set only when the view is drawn outside WidgetKit (screenshot gallery).
+    var familyOverride: WidgetFamily?
+    @Environment(\.widgetFamily) private var environmentFamily
+
+    private var family: WidgetFamily { familyOverride ?? environmentFamily }
 
     var body: some View {
         Group {
@@ -281,7 +285,11 @@ struct LargeCell: View {
 
 struct RegionView: View {
     var entry: ForecastEntry
-    @Environment(\.widgetFamily) private var family
+    /// Set only when the view is drawn outside WidgetKit (screenshot gallery).
+    var familyOverride: WidgetFamily?
+    @Environment(\.widgetFamily) private var environmentFamily
+
+    private var family: WidgetFamily { familyOverride ?? environmentFamily }
 
     private var days: [DayForecast] {
         entry.forecast?.region(entry.region)?.upcomingDays(from: entry.date) ?? []

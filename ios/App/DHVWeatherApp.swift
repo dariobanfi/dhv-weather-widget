@@ -7,11 +7,23 @@ struct DHVWeatherApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView(store: store)
-                .onOpenURL { store.open($0) }
-                .task(id: scenePhase) {
-                    if scenePhase == .active { await store.refresh(maxAge: 5 * 60) }
-                }
+            #if DEBUG
+            if let mode = WidgetGallery.Mode.fromLaunchArguments {
+                WidgetGallery(mode: mode)
+            } else {
+                main
+            }
+            #else
+            main
+            #endif
         }
+    }
+
+    private var main: some View {
+        ContentView(store: store)
+            .onOpenURL { store.open($0) }
+            .task(id: scenePhase) {
+                if scenePhase == .active { await store.refresh(maxAge: 5 * 60) }
+            }
     }
 }

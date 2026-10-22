@@ -54,9 +54,9 @@ ios/
 ├── project.yml        XcodeGen project (app + widget extension)
 ├── DHVKit/            Swift package: DHV page parser, model, cache, tests
 │   └── Sources/dhv-check   `swift run dhv-check` prints the live forecast as parsed (`--html` dumps the raw markup)
-├── App/               SwiftUI host app
+├── App/               SwiftUI host app (+ debug-only widget gallery for screenshots)
 ├── Widget/            WidgetKit extension
-└── Shared/            Colours and symbols used by both
+└── Shared/            Widget views, colours and symbols used by both
 ```
 
 `swift test` in `ios/DHVKit` runs the parser tests on any Mac. CI also runs `dhv-check` against the live page, so a DHV layout change shows up in the build log.

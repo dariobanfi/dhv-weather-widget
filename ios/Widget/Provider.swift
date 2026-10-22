@@ -2,18 +2,6 @@ import AppIntents
 import DHVKit
 import WidgetKit
 
-struct ForecastEntry: TimelineEntry {
-    var date: Date
-    var forecast: Forecast?
-    var error: String?
-    var isFromCache = false
-    var region: RegionID = .nordalpen
-
-    static func sample(region: RegionID = .nordalpen) -> ForecastEntry {
-        ForecastEntry(date: .now, forecast: .sample(), region: region)
-    }
-}
-
 enum Timelines {
     /// One entry now, plus one just after each of the next two midnights so
     /// "Today" / "Tomorrow" roll over even if no refresh happens overnight.
