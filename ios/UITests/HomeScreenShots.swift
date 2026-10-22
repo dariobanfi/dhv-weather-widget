@@ -46,11 +46,6 @@ final class HomeScreenShots: XCTestCase {
                 shoot(name)
             }
         }
-        // Clear also comes in a dark variant on iOS 26.
-        if setAppearance("Clear", variant: "Dark") {
-            sleep(4)
-            shoot("hs-clear-dark")
-        }
         _ = setAppearance("Default")
 
         XCTAssertGreaterThan(shots, 0, "No Home Screen screenshot was taken")
