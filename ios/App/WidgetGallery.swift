@@ -69,11 +69,14 @@ struct WidgetGallery: View {
     }
 
     /// Outside WidgetKit `containerBackground` is ignored, so draw the same
-    /// background and the Home Screen's rounded corners here.
+    /// full-colour background and the Home Screen's rounded corners here. The
+    /// container shape lets the tiles' concentric corners line up as they do
+    /// on the Home Screen.
     private func tile(_ content: some View, size: CGSize) -> some View {
         let shape = RoundedRectangle(cornerRadius: 24, style: .continuous)
         return content
             .frame(width: size.width, height: size.height)
+            .containerShape(shape)
             .background { SkyBackground() }
             .clipShape(shape)
             .shadow(color: .black.opacity(0.25), radius: 12, y: 6)
@@ -89,7 +92,7 @@ struct WidgetGallery: View {
     }
 }
 
-/// A plain alpine-dusk wallpaper so the glass has something to refract.
+/// A plain alpine-dusk wallpaper behind the widgets.
 private struct Wallpaper: View {
     var lock: Bool
     @Environment(\.colorScheme) private var scheme

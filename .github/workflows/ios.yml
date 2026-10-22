@@ -13,6 +13,10 @@ on:
         description: Commit the widget screenshots to assets/ios on this branch
         type: boolean
         default: false
+      commit_debug:
+        description: Also commit the Home Screen test's debug frames to assets/ios/debug
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -99,7 +103,7 @@ jobs:
   screenshots:
     name: Widget screenshots (simulator)
     runs-on: macos-26
-    timeout-minutes: 40
+    timeout-minutes: 60
     defaults:
       run:
         working-directory: ios
@@ -156,20 +160,50 @@ jobs:
           shoot light home home-sample-markers sample
           ls -l screenshots
 
+      - name: Real Home Screen (SpringBoard UI test)
+        # Adds the widgets to the simulator's Home Screen and screenshots them in
+        # Default, Dark, Clear and Tinted, i.e. what iOS itself draws, Liquid
+        # Glass included. SpringBoard isn't an API, so this never blocks CI.
+        continue-on-error: true
+        timeout-minutes: 25
+        run: |
+          xcrun simctl ui "$UDID" appearance light
+          mkdir -p screenshots/home-screen
+          set -o pipefail
+          # TEST_RUNNER_* environment variables reach the test process without the prefix.
+          TEST_RUNNER_SHOTS_DIR="$PWD/screenshots/home-screen" xcodebuild test \
+            -project DHVWeather.xcodeproj \
+            -scheme HomeScreenShots \
+            -destination "id=$UDID" \
+            -derivedDataPath build/dd \
+            CODE_SIGNING_ALLOWED=NO \
+            2>&1 | tee build/uitest.log | grep -E 'HOMESHOT|error|Test Case|\*\* TEST' || true
+          echo "--- accessibility dumps ---"
+          grep -n -A 60 'HOMESHOT missing\|HOMESHOT Customize' build/uitest.log | grep -v 'Icon, .*{{0.0, 0.0}, {0.0, 0.0}}' | head -1500 || true
+          ls -l screenshots/home-screen
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: widget-screenshots
           path: |
-            ios/screenshots/*.png
+            ios/screenshots/**/*.png
             ios/build/sim.log
+            ios/build/uitest.log
           retention-days: 30
 
       - name: Commit screenshots to assets/ios
         if: github.event_name == 'workflow_dispatch' && inputs.commit_screenshots
         run: |
           mkdir -p ../assets/ios
-          for f in screenshots/*.png; do
+          if [ "${{ inputs.commit_debug }}" = "true" ]; then
+            mkdir -p ../assets/ios/debug
+            for f in screenshots/home-screen/*.png; do
+              sips --resampleWidth 402 "$f" --out "../assets/ios/debug/$(basename "$f")" >/dev/null
+            done
+          fi
+          for f in screenshots/*.png screenshots/home-screen/hs-*.png; do
+            [ -f "$f" ] || continue
             sips --resampleWidth 603 "$f" --out "../assets/ios/$(basename "$f")" >/dev/null
           done
           cd ..

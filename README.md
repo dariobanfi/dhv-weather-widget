@@ -26,9 +26,12 @@ Install:
 
 ## iOS
 
-<img src="assets/ios/home-light.png" height="400" alt="iOS Home Screen widgets"> <img src="assets/ios/lock-dark.png" height="400" alt="iOS Lock Screen and small widgets">
+<img src="assets/ios/hs-default.png" height="400" alt="iOS Home Screen, Default"> <img src="assets/ios/hs-dark.png" height="400" alt="iOS Home Screen, Dark"> <img src="assets/ios/hs-clear.png" height="400" alt="iOS Home Screen, Clear (Liquid Glass)"> <img src="assets/ios/hs-tinted.png" height="400" alt="iOS Home Screen, Tinted"> <img src="assets/ios/lock-dark.png" height="400" alt="iOS Lock Screen and small widgets">
 
-- Liquid Glass tiles tinted by DHV's own markers (Thermikwetter, Störungswetter, Warnhinweis), with weather icons read from DHV's bold key phrases.
+Real iOS 26 Home Screen in the simulator: Default, Dark, Clear and Tinted. The glass is drawn by iOS itself.
+
+- Built to Apple's widget guidance for Liquid Glass: the background lives in `containerBackground`, so with a **Clear** or **Tinted** Home Screen (long-press → Edit → Customize) iOS swaps it for real Liquid Glass or your tint. In Default and Dark the widget is full colour.
+- Day tiles are tinted by DHV's own markers (Thermikwetter, Störungswetter, Warnhinweis), with weather icons read from DHV's bold key phrases. In Clear and Tinted the markers stay readable as symbols.
 - Days are matched and labelled by date, so the columns stay right after DHV's evening update and at midnight.
 - Refreshes shortly after DHV's announced next update, at least every 3 hours, and whenever you open the app.
 
@@ -43,6 +46,6 @@ Signing notes, App Groups and building in Xcode are in [ios/README.md](ios/READM
 ## Build
 
 - Android: `./gradlew assembleDebug`
-- iOS: `brew install xcodegen && cd ios && xcodegen generate`, then open `DHVWeather.xcodeproj` in Xcode 26. CI builds the unsigned IPA and simulator screenshots of the widgets on every push to `ios/`.
+- iOS: `brew install xcodegen && cd ios && xcodegen generate`, then open `DHVWeather.xcodeproj` in Xcode 26. CI builds the unsigned IPA on every push to `ios/`, and screenshots the widgets on the simulator's real Home Screen (a SpringBoard UI test) in each appearance.
 
 The forecast comes from the DHV website and belongs to the Deutscher Hängegleiterverband. It is not an official flight weather briefing: the pilot decides.

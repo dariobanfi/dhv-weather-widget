@@ -9,10 +9,10 @@ A native iOS 26 app and WidgetKit widgets for the [DHV-Wetter](https://www.dhv.d
 | **DHV Wetter** | Medium, Large | All three regions × the next days. Medium: headline per day. Large: headline, DHV's key phrase and wind. |
 | **DHV Region** | Small, Lock Screen (rectangular, inline) | One region (long-press → Edit Widget to choose). |
 
-- Each day is a glass tile. The icon shows the sky as DHV describes it (sun, cloud, showers, rain, snow, Föhn), read from DHV's bold key phrase.
+- Each day is a tile. The icon shows the sky as DHV describes it (sun, cloud, showers, rain, snow, Föhn), read from DHV's bold key phrase.
 - When DHV marks a day as Thermikwetter (👍), Störungswetter (👎) or with a Warnhinweis (⚠︎), the tile is tinted green, red or yellow and shows the badge. DHV mostly sets these markers in thermal season; outside it the tiles stay blue-grey.
 - Columns are matched by date and labelled from the real date (Today / Tomorrow / weekday), so they roll over at midnight and never show yesterday as "Today".
-- With a **Clear** or **Tinted** Home Screen (long-press the Home Screen → Edit → Customize) iOS renders the widget in its Liquid Glass style; everything stays readable there because the sky and DHV's markers are symbols, not only colours.
+- The Liquid Glass comes from iOS, as Apple's widget guidance intends: with a **Clear** or **Tinted** Home Screen (long-press the Home Screen → Edit → Customize) iOS renders the widget in accented mode, removes its sky background and draws real glass or your tint behind the content. The widget doesn't fake glass itself (a custom glass effect doesn't render inside widgets). Everything stays readable there because the sky and DHV's markers are symbols, not only colours.
 - The widget refreshes shortly after DHV's announced next update (morning ~7–8 h, evening ~18–19 h) and at least every 3 hours, as far as iOS's widget budget allows. Opening the app refreshes everything immediately.
 - Tapping a widget opens the app on that region.
 
@@ -55,6 +55,7 @@ ios/
 ├── DHVKit/            Swift package: DHV page parser, model, cache, tests
 │   └── Sources/dhv-check   `swift run dhv-check` prints the live forecast as parsed (`--html` dumps the raw markup)
 ├── App/               SwiftUI host app (+ debug-only widget gallery for screenshots)
+├── UITests/           CI-only SpringBoard test: real Home Screen shots in Default, Dark, Clear, Tinted
 ├── Widget/            WidgetKit extension
 └── Shared/            Widget views, colours and symbols used by both
 ```
