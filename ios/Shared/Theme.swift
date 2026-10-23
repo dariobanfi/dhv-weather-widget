@@ -56,11 +56,12 @@ extension DayForecast {
 enum Palette {
     static let warning = Color(red: 1.0, green: 0.72, blue: 0.18)
 
-    /// Alpine dusk sky used behind the glass.
+    /// Background in Default and Dark. The light one matches the deep blue a
+    /// Tinted Home Screen gives the widget.
     static func sky(_ scheme: ColorScheme) -> LinearGradient {
         let colors: [Color] = scheme == .dark
             ? [Color(red: 0.05, green: 0.09, blue: 0.20), Color(red: 0.10, green: 0.16, blue: 0.33), Color(red: 0.18, green: 0.20, blue: 0.38)]
-            : [Color(red: 0.16, green: 0.42, blue: 0.86), Color(red: 0.33, green: 0.58, blue: 0.95), Color(red: 0.55, green: 0.73, blue: 0.98)]
+            : [Color(red: 0.07, green: 0.22, blue: 0.58), Color(red: 0.13, green: 0.31, blue: 0.68), Color(red: 0.20, green: 0.38, blue: 0.72)]
         return LinearGradient(colors: colors, startPoint: .topLeading, endPoint: .bottomTrailing)
     }
 }
