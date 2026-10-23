@@ -23,7 +23,6 @@ struct DayTile: ViewModifier {
     var rating: Rating?
     var emphasis: Double = 1
     @Environment(\.widgetRenderingMode) private var mode
-    @Environment(\.colorScheme) private var scheme
 
     func body(content: Content) -> some View {
         content.background {
@@ -42,10 +41,11 @@ struct DayTile: ViewModifier {
         }
     }
 
+    // Full colour uses the same strengths as the Tinted Home Screen, so the
+    // widget looks the same in every appearance.
     private var fill: Color {
-        guard mode == .fullColor else { return .white.opacity(0.10) }
-        if let rating, rating != .neutral { return rating.tint.opacity(scheme == .dark ? 0.42 : 0.48) }
-        return .white.opacity(scheme == .dark ? 0.10 : 0.17)
+        guard mode == .fullColor, let rating, rating != .neutral else { return .white.opacity(0.10) }
+        return rating.tint.opacity(accentedStrength(rating))
     }
 
     private func accentedStrength(_ rating: Rating) -> Double {
@@ -127,7 +127,7 @@ struct SkyBackground: View {
         ZStack {
             Palette.sky(scheme)
             // Soft sun glow, top right.
-            RadialGradient(colors: [.white.opacity(scheme == .dark ? 0.10 : 0.28), .clear],
+            RadialGradient(colors: [.white.opacity(scheme == .dark ? 0.10 : 0.12), .clear],
                            center: .topTrailing, startRadius: 0, endRadius: 220)
         }
     }
